@@ -175,7 +175,7 @@ public class Artikel {
 
 
   public boolean Artikel(String einheit, String name, String kategorie, String ean, String gewicht,
-      String anzahl, String preis, String grundpreis) {
+      String anzahl, String preis, String grundpreis, String plu) {
 
     if (checkName(name) == true) {
       this.name = name;
@@ -197,13 +197,14 @@ public class Artikel {
       System.out.println("ean");
       return false;
     }
-
+    
     if (checkPlu(plu) == true) {
-      this.plu = plu;
+        this.plu = plu;
     } else {
       System.out.println("plu");
       return false;
     }
+    
 
     if (checkGewicht(gewicht) == true) {
       this.gewicht = gewicht;
