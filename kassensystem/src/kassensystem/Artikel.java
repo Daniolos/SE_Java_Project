@@ -166,7 +166,7 @@ public class Artikel {
 
 
   public boolean Artikel(String einheit, String name, String kategorie, String ean, String gewicht,
-      String anzahl, String preis) {
+      String anzahl, String preis, String grundpreis, String plu) {
 
     if (checkName(name) == true) {
       this.name = name;
