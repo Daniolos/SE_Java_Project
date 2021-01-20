@@ -55,7 +55,7 @@ public class Artikel {
   public boolean checkEan(String ean) {
 
     // EAN überprüfen
-    if (ean.matches("[0-9]+") = false) {
+    if (!ean.matches("[0-9]+")) {
       return false;
     }
 
@@ -69,7 +69,7 @@ public class Artikel {
   public boolean checkPlu(String plu) {
 
     // EAN überprüfen
-    if (ean.matches("[0-9]+") = false) {
+    if (!ean.matches("[0-9]+")) {
       return false;
     }
 
@@ -83,71 +83,80 @@ public class Artikel {
   public boolean checkGewicht(String gewicht) {
 
     // gewicht überprüfen
+    try {
+      
+      if ((einheit == "Gramm") && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 100000)) {
+        return false;
+      }
 
-    // regex erkennt floats und integers
-    if (gewicht.matches("[0-9]*,?[0-9]+") == false) {
-      return false;
-    }
-    
-    if ((einheit == "Gramm" & 1 <= Float.parseFloat(gewicht) <= 100000) == false) {
+      if ((einheit == "Kilo") && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100)) {
+        return false;
+      }
+
+      if ((einheit == "Liter") && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100)) {
+        return false;
+      }
+
+      if ((einheit == "ml") && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 10000)) {
+        return false;
+      }
+
+    } catch (NumberFormatException e) {
+      System.err.println("Ungültige Eingabe bei Gewicht.");
       return false;
     }
 
-    if ((einheit == "Kilo" & 0,1 <= Float.parseFloat(gewicht) <= 100) == false) {
-      return false;
-    }
-    
-    if ((einheit == "Liter" & 0,1 <= Float.parseFloat(gewicht) <= 100) == false) {
-      return false;
-    }
-    
-    if ((einheit == "ml" & 1 <= Float.parseFloat(gewicht) <= 10000) == false) {
-      return false;
-    }
-    
     return true;
-    
+
   }
 
   public boolean checkAnzahl(String anzahl) {
+
+    if (anzahl == null) { return false; }
+    if (anzahl == "n") { return true; }
     
-   if (anzahl.matches("[1-9]+") == false) {
-     if (anzahl == "n") {
-       return true;
-     }
-     return false;
-   }
-   
-   if ( 1 <= Integer.parseInt(anzahl) <= 1000) == false {
-     return false;
-   }
-   
-   return true;
-   
+    try {
+      if (!(Integer.parseInt(anzahl) >= 1) || !(Integer.parseInt(anzahl) <= 1000)) {
+        return false;
+      }
+    } catch (NumberFormatException e) {
+      System.err.println("Ungültige Eingabe bei Anzahl");
+      return false;
+    }
+
+    return true;
+
   }
 
   public boolean checkPreis(String preis) {
+    
     // preis überprüfen
-    
-    if (preis.matches("[0-9]*,?[0-9]+") == false) {
+    if (preis == null) { return false; }
+
+    try {
+     
+      if (!(Float.parseFloat(preis) >= 0.001) || !(Float.parseFloat(preis) <= 100000)) {
+        return false;
+      }
+    } catch (NumberFormatException e) {
+      System.err.println("Ungültige Eingabe bei Preis.");
       return false;
     }
-    
-    if (0,001 <= Float.parseFloat(preis) <= 100000) {
-      return false;
-    }
-    
+
     return true;
-    
   }
 
   public boolean checkGrundpreis(String grundpreis) {
     
-    if (grundpreis.matches("[0-9]*,?[0-9]+") == false) {
-      return false;
-    }
-    
-    if (0,001 <= Float.parseFloat(grundpreis) <= 100000) {
+    if (grundpreis == null) { return false; }
+    try {
+      
+      if ( !(Float.parseFloat(grundpreis) >= 0.001) || !(Float.parseFloat(grundpreis) <= 100000) ) {
+         return false;
+      }
+      
+    } catch (NumberFormatException e) {
+      System.err.println("Ungültige Eingabe bei Grundpreis.");
       return false;
     }
     
@@ -166,62 +175,72 @@ public class Artikel {
 
 
   public boolean Artikel(String einheit, String name, String kategorie, String ean, String gewicht,
-      String anzahl, String preis, String grundpreis, String plu) {
+      String anzahl, String preis, String grundpreis) {
 
     if (checkName(name) == true) {
       this.name = name;
     } else {
+      System.out.println("name");
       return false;
     }
 
     if (checkKategorie(kategorie) == true) {
       this.kategorie = kategorie;
     } else {
+      System.out.println("kategorie");
       return false;
     }
 
     if (checkEan(ean) == true) {
       this.ean = ean;
     } else {
+      System.out.println("ean");
       return false;
     }
 
     if (checkPlu(plu) == true) {
       this.plu = plu;
     } else {
+      System.out.println("plu");
       return false;
     }
 
     if (checkGewicht(gewicht) == true) {
       this.gewicht = gewicht;
     } else {
+      System.out.println("gewicht");
       return false;
     }
 
     if (checkAnzahl(anzahl) == true) {
       this.anzahl = anzahl;
     } else {
+      System.out.println("anzahl");
       return false;
     }
 
     if (checkPreis(preis) == true) {
       this.preis = preis;
     } else {
+      System.out.println("preis");
       return false;
     }
 
-    if (checkGrundpreis(preis) == true) {
+    if (checkGrundpreis(grundpreis) == true) {
       this.grundpreis = grundpreis;
     } else {
+      System.out.println("grundpreis");
       return false;
     }
 
     if (checkEinheit(einheit) == true) {
-      this.einheit == einheit;
+      this.einheit = einheit;
     } else {
+      System.out.println("einheit");
       return false;
     }
-    
+
+    return true;
   }
 
 
@@ -361,9 +380,9 @@ public class Artikel {
   }
 
   public boolean setEinheit(String einheit) {
-    
-    if(checkEinheit(einheit) == true) {
-      this.einheit == einheit;
+
+    if (checkEinheit(einheit) == true) {
+      this.einheit = einheit;
       return true;
     } else {
       return false;
