@@ -29,6 +29,14 @@ public class Einkaufsliste extends ArrayList<Artikel> {
     }
     return;
   }
+  
+  public int Anzahl(Artikel artikel) {
+    int counter = 0;
+    for (Artikel s: this) {
+      if s.getEan() == artikel.getEan() { counter++; }
+    }
+    return counter;
+  }
 
   public float getZwischensumme() {
     return zwischensumme;
