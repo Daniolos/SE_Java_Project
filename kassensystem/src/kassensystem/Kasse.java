@@ -8,6 +8,8 @@ import Database.Lager;
 import Parsing.Artikel;
 import Parsing.XMLParser;
 
+//liest Artikel aus XML
+
 public class Kasse {
 
 	public static void main(String[] args) {

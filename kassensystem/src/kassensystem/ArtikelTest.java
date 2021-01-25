@@ -5,10 +5,15 @@ public class ArtikelTest {
   
   public static void main(String[] args) {
     
-    //einheit, name, kategorie, ean, gewicht, anzahl, preis, grundpreis, plu
-    Artikel mehl = new Artikel("ml","Mehl","Backwaren","1111111111113","30","10","3.20","1.20","33333");
+    KategorieListe kategorien = new KategorieListe();
+    kategorien.addKategorie("Obst");
+    kategorien.addKategorie("Backwaren");
     
-    Artikel apfel = new Artikel("Kilo","Apfel","Obst","0000000055555","300","n","1.0","1.20","55555");
+    // name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis
+    Artikel mehl = new Artikel("Mehl","1111111111113","Backwaren","ml","33333","0","0","0","0");
+    Artikel apfel = new Artikel("Apfel", "0000000055555", "Obst", "n", "55555", "1", "300", "1,20", "0,1");
+    
+
     
     Einkaufsliste einkauf = new Einkaufsliste();
     einkauf.add(mehl);

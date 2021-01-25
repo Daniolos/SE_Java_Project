@@ -1,6 +1,9 @@
 package Parsing;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+
+import Database.*;
 
 public class KategorieListe extends HashSet<String> {
 
@@ -13,8 +16,29 @@ public class KategorieListe extends HashSet<String> {
 		return this.isEmpty();
 	}
 
+	public boolean checkKategorie(String kategorie) {
+
+		return kategorie.matches("[a-zA-Z]+") ? (3 <= kategorie.length() && kategorie.length() <= 32) : false;
+	}
+
 	public void addKategorie(String kategorie) {
-		this.add(kategorie);
+		if (checkKategorie(kategorie)) {
+			this.add(kategorie);
+		}
+		
+		return;
+	}
+
+	// für Kategorien, die nicht vergeben sind
+	public void removeKategorie(String kategorie) {
+		
+		return;
+	}
+
+	public void readKategorie(LinkedList<Artikel> artikelliste) {
+		for (Artikel a : artikelliste) {
+			this.addKategorie(a.getKategorie());
+		}
 		return;
 	}
 

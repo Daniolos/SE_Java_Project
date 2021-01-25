@@ -14,16 +14,17 @@ public class Artikel {
 	private String anzahl;
 	private String preis;
 	private String grundpreis;
-	// id?
+//TODO fix assignment of Einheit
+//TODO kategorieListe as parameter of artikel?
 
 	public boolean checkName(String name) {
 		// name überprüfen
-		return 2 <= name.length() && name.length() <= 32;
+		return name.length() >= 2 && name.length() <= 32;
 	}
 
 	public boolean checkKategorie(String kategorie) {
 		// kategorie überprüfen
-		return !kategorie.matches("[a-zA-Z]+") ? 3 <= kategorie.length() && kategorie.length() <= 32 : false;
+		return kategorie.matches("[a-zA-Z]+") ? (3 <= kategorie.length() && kategorie.length() <= 32) : false;
 	}
 
 	public boolean checkEan(String ean) {
@@ -42,8 +43,7 @@ public class Artikel {
 
 	public boolean checkPlu(String plu) {
 
-		// EAN überprüfen
-		if (!ean.matches("[0-9]+")) {
+		if (!plu.matches("[0-9]+")) {
 			return false;
 		}
 
@@ -56,15 +56,32 @@ public class Artikel {
 
 	public boolean checkGewicht(String gewicht) {
 
-		// gewicht überprüfen
-
 		// regex erkennt floats und integers
 
-		return !gewicht.matches("[0-9]*,?[0-9]+")
-				|| !(einheit.equals("g") & 1 <= Float.parseFloat(gewicht) && Float.parseFloat(gewicht) <= 100000)
-				|| !(einheit.equals("kg") & 0.1 <= Float.parseFloat(gewicht) && Float.parseFloat(gewicht) <= 100)
-				|| !(einheit.equals("l") & 0.1 <= Float.parseFloat(gewicht) && Float.parseFloat(gewicht) <= 100)
-				|| !(einheit.equals("ml") & 1 <= Float.parseFloat(gewicht) && Float.parseFloat(gewicht) <= 10000);
+		if (!(gewicht.matches("[0-9]*(,|.)?[0-9]+"))) {
+			return false;
+		}
+
+		// gewicht überprüfen
+		try {
+
+			if (((einheit == "Gramm") && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 100000))
+					|| ((einheit == "Kilo") && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100))
+					|| ((einheit == "Liter") && (Float.parseFloat(gewicht) >= 0.1)
+							&& (Float.parseFloat(gewicht) <= 100))
+					|| ((einheit == "ml") && (Float.parseFloat(gewicht) >= 1)
+							&& (Float.parseFloat(gewicht) <= 10000))) {
+
+				return true;
+			}
+
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			System.err.println("Ungültige Eingabe bei Gewicht.");
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean checkAnzahl(String anzahl) {
@@ -82,8 +99,21 @@ public class Artikel {
 	public boolean checkPreis(String preis) {
 		// preis überprüfen
 
-		return preis.matches("[0-9]*,?[0-9]+") && (0.001 <= Float.parseFloat(preis.replace(",", "."))
-				&& Float.parseFloat(preis.replace(",", ".")) <= 100000);
+		if (!preis.matches("[0-9]*(,|.)?[0-9]+")) {
+			return false;
+		}
+		try {
+			if (0.001 <= Float.parseFloat(preis.replace(",", "."))
+					&& Float.parseFloat(preis.replace(",", ".")) <= 100000) {
+				return true;
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			System.err.println("Ungültige Eingabe bei Preis.");
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean checkGrundpreis(String grundpreis) {
@@ -94,8 +124,8 @@ public class Artikel {
 
 	public boolean checkEinheit(String einheit) {
 
-		for (int i = 0; i < einheiten.length; i++) {
-			if (einheiten[i].equals(einheit)) {
+		for (String s : this.einheiten) {
+			if (s.equals(einheit)) {
 				return true;
 			}
 		}
@@ -196,17 +226,17 @@ public class Artikel {
 	}
 
 	public void setPlu(String plu) {
-		if (checkPlu(plu))
+		if (checkPlu(plu)) {
 			this.plu = plu;
+		}
 	}
 
 	public void setGewicht(String gewicht) {
-		this.gewicht = checkGewicht(gewicht) ? gewicht : "";
+		this.gewicht = checkGewicht(gewicht) ? gewicht.replace(",", ".") : "";
 	}
 
 	public void setAnzahl(String anzahl) {
-		if (checkAnzahl(anzahl))
-			this.anzahl = anzahl;
+		this.anzahl = checkAnzahl(anzahl) ? anzahl : "0";
 	}
 
 	public void setPreis(String preis) {
@@ -220,8 +250,9 @@ public class Artikel {
 	}
 
 	public void setEinheit(String einheit) {
-		if (checkEinheit(einheit))
-			this.einheit = einheit;
+		//if (checkEinheit(einheit))
+			//this.einheit = einheit;
+		this.einheit = checkEinheit(einheit) ? einheit : "";
 	}
 
 	/*

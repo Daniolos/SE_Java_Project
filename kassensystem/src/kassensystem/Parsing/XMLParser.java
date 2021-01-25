@@ -71,6 +71,8 @@ public class XMLParser
 	// würde fehler auslösen, wenn gleicher tag in der Hierarchie tiefer auftauchen würde
 	// Signatur für XML
 	
+	
+	// hier werden einzelne Attribute "tag" (zB Kategorie, Name, ...) eingelesen
 	public String getChild (String tag)
 	{
 		if (!hasTag(tag)) return "";

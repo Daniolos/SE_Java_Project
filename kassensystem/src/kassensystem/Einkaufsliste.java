@@ -35,7 +35,7 @@ public class Einkaufsliste extends ArrayList<Artikel> {
   public int getAnzahl(Artikel artikel) {
     int counter = 0;
     for (Artikel s: this) {
-      if (s.getEan() == artikel.getEan()) { counter++; }
+      if (s.getEan().equals(artikel.getEan())) { counter++; }
     }
     return counter;
   }
