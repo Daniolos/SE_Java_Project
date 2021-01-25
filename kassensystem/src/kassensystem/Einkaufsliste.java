@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import Parsing.*;
+import Database.*;
 
 public class Einkaufsliste extends ArrayList<Artikel> {
 
