@@ -11,11 +11,13 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 import java.awt.Color;
+import java.lang.Math.*;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.RowFilter;
 import javax.swing.JTable;
 
 public class GUIEinkauf extends JFrame
@@ -28,9 +30,11 @@ public class GUIEinkauf extends JFrame
 	private JButton addValueButton;
 	private JButton removeButton;
 	private JButton removeAllButton;
+	private JButton searchButton;
 	private JTable bestandsListe;
 	private JTable einkaufsListe;
 	private JTextField insertValue;
+	private JTextField searchField;
 	private float zValue = 0f;
 	/*XMLDecoder xd = new XMLDecoder(is);
     model = (DefaultTableModel)xd.readObject();
@@ -61,6 +65,8 @@ public class GUIEinkauf extends JFrame
 	insertValue = new JTextField("Hier Wert eingeben");
 	addValueButton = new JButton("Menge eingeben");
 	zwischensumme = new JLabel("Zwischensumme: "+ zValue +" €");
+	searchField = new JTextField("Suchwort: ");
+	searchButton = new JButton("Suche!");
 	
 
 	
@@ -109,7 +115,9 @@ public class GUIEinkauf extends JFrame
 	interactionsPanel.add(removeAllButton);
 	interactionsPanel.add(insertValue);
 	interactionsPanel.add(addValueButton);
-	interactionsPanel.add(zwischensumme);	
+	interactionsPanel.add(zwischensumme);
+	interactionsPanel.add(searchField);
+	interactionsPanel.add(searchButton);
 	insertValue.setVisible(false);
 	addValueButton.setVisible(false);
 	
@@ -129,10 +137,10 @@ public class GUIEinkauf extends JFrame
 
 	
 	
-										// Bestandsliste zur graphischen Oberfl夨e hinzuf??
-	
-	
-	
+
+	// Zum sortieren (filtern) später
+	TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
+	bestandsListe.setRowSorter(tr);	
 	
 	einkaufsListeModel.addColumn("Endpreis");
 	einkaufsListe.getColumnModel().getColumn(EANSpalte).setMinWidth(0);	
@@ -188,26 +196,34 @@ public class GUIEinkauf extends JFrame
 								}
 								else {
 									
+									float Mult = 10f;
 									/*
 									 * Hier werden bei den nicht-Stück Mengen die einzelnen Umrechnungen zwischen den Einheiten durchgeführt
 									 */
 									if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Gramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Kilogramm")) {
-										System.out.println("1");
+										Mult = 0.001f;
 									};
 									
 									if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Kilogramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Gramm")) {
 										System.out.println("2");
+										Mult = 10f;
 									};
 									
 									if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Liter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Milliliter")) {
 										System.out.println("3");
+										Mult = 10f;
 									};
 									
 									if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Liter")) {
 										System.out.println("4");
+										Mult = 0.001f;
 									};
-									
-									
+									bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()), bestandsListe.getSelectedRow(), MengeSpalte);
+									Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
+									einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+									einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+									einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Mult * ((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, PreisSpalte)), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+									changeZwischensumme((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte));
 								}
 							}
 						}
@@ -245,9 +261,14 @@ public class GUIEinkauf extends JFrame
 			{
 				i++;
 			}
-			bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(i,MengeSpalte)) + 1, i, MengeSpalte);
+			if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), 5) == "Stück") {
+				bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(i,MengeSpalte)) + 1, i, MengeSpalte);
+				}	
+				else {
+				bestandsListeModel.setValueAt(((Integer) einkaufsListe.getValueAt(einkaufsListe.getSelectedRow(),MengeSpalte)) + (Integer)bestandsListe.getValueAt(i,MengeSpalte), i, MengeSpalte);
+				}
 			
-			changeZwischensumme((Float) (einkaufsListe.getValueAt(einkaufsListe.getSelectedRow(), PreisSpalte)) - 2* (Float) (einkaufsListe.getValueAt(einkaufsListe.getSelectedRow(), PreisSpalte)));
+			changeZwischensumme((Float) (einkaufsListe.getValueAt(einkaufsListe.getSelectedRow(), EndpreisSpalte)) - 2* (Float) (einkaufsListe.getValueAt(einkaufsListe.getSelectedRow(), EndpreisSpalte)));
 			einkaufsListeModel.removeRow(einkaufsListe.getSelectedRow());
 			}
 		});
@@ -265,22 +286,40 @@ public class GUIEinkauf extends JFrame
 				{
 					j++;
 				}
-				bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(j,MengeSpalte)) + 1, j, MengeSpalte);		
+				if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), 5) == "Stück") {
+				bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(j,MengeSpalte)) + 1, j, MengeSpalte);
+				}	
+				else {
+				bestandsListeModel.setValueAt(((Integer) einkaufsListe.getValueAt(i,MengeSpalte)), j, MengeSpalte);
+				}
 			}
 			einkaufsListeModel.getDataVector().removeAllElements();
 			einkaufsListe.repaint();
 			zwischensumme.setText("Zwischensumme: 0€");
 				zValue = 0f;
 				}
-			});		
+			});	
+	searchButton.addActionListener(new ActionListener() {
+	      public void actionPerformed(ActionEvent e) {
+	        String text = searchField.getText();
+	        if (text.length() == 0) {
+	          tr.setRowFilter(null);
+	        } else {
+	          tr.setRowFilter(RowFilter.regexFilter(text));
+	        }
+	      }
+	    });
+	
 }	
 	
 	public static void main(String[] args) 
 	{
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			public void run() {
 		GUIEinkauf gui = new GUIEinkauf();
 		gui.setTitle("Einkaufsansicht");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gui.setExtendedState(JFrame.MAXIMIZED_BOTH);  //Fullscreen
-		gui.setVisible(true);
+		gui.setVisible(true);}});
 	}
 }
