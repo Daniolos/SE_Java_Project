@@ -124,8 +124,8 @@ public class Artikel {
 
 	public boolean checkEinheit(String einheit) {
 
-		for (String s : this.einheiten) {
-			if (s.equals(einheit)) {
+		for (int i = 0; i < einheiten.length; i++) {
+			if (einheiten[i].equals(einheit)) {
 				return true;
 			}
 		}
@@ -148,7 +148,6 @@ public class Artikel {
 	}
 
 	// XML Constructor
-
 	public Artikel(String xml) {
 		xmlParser = new XMLParser(xml);
 		setNameFromXML();
@@ -214,7 +213,7 @@ public class Artikel {
 		if (checkName(name))
 			this.name = name;
 	}
-
+//TODO irgendwie mit KategorieListe integrieren
 	public void setKategorie(String kategorie) {
 		if (checkKategorie(kategorie))
 			this.kategorie = kategorie;
@@ -252,7 +251,7 @@ public class Artikel {
 	public void setEinheit(String einheit) {
 		//if (checkEinheit(einheit))
 			//this.einheit = einheit;
-		this.einheit = checkEinheit(einheit) ? einheit : "";
+		this.einheit = (checkEinheit(einheit) ? einheit : "");
 	}
 
 	/*
@@ -260,9 +259,9 @@ public class Artikel {
 	 * 
 	 * 
 	 */
-
 	private void setNameFromXML() {
-		name = xmlParser.getChild("name");
+		this.name = xmlParser.getChild("name");
+		return;
 	}
 
 	private void setKategorieFromXML() {

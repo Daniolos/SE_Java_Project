@@ -48,7 +48,7 @@ public class Einkaufsliste extends ArrayList<Artikel> {
     for (Artikel s: this) {
       System.out.println("Name: " + s.getName());
       System.out.println("Kategorie: " + s.getKategorie());
-      System.out.println("Einheit: " + s.getKategorie());
+      System.out.println("Einheit: " + s.getEinheit());
       System.out.println("EAN/ PLU: " + s.getEan());
       System.out.println("Gewicht: " + s.getGewicht());
       System.out.println("Anzahl: " + s.getAnzahl());
