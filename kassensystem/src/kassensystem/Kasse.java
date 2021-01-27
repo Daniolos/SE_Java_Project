@@ -32,6 +32,8 @@ public class Kasse {
 			
 			Lager b = new Lager(xml.getXML());
 			b.print();
+			System.out.println("Länge der Artikelliste: " + b.getArtikel().size());
+			System.out.println("Länge der Kategorienliste: " + b.getKategorien().size());
 			System.out.println("Hier kommen die Kategorien: ");
 			b.getKategorien().printer();
 			

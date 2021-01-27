@@ -17,7 +17,7 @@ public class Lager {
 		setAllArticlesFromString(xml);
 		fillLager();
 		for (Artikel a : articles) {
-			kategorien.addKategorie(a.getKategorie());
+			kategorien.addKategorie(a);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class Lager {
 
 	public void ArtikelHinzufuegen(Artikel article) {
 		articles.add(article); // Was passiert, wenn Artikel leer sind, wenn Artikel doppelt sind usw. (noch hinzuf.)
-		if (!kategorien.contains(article.getKategorie())) {
+		if (!kategorien.contains(article.getKategorie())) {	// Braucht man das überhaupt? Kategorien werden ja extra dazugefügt... oder?
 			kategorien.addKategorie(article);
 		}
 	}

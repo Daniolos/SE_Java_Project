@@ -24,7 +24,7 @@ public class Artikel {
 
 	public boolean checkKategorie(String kategorie) {
 		// kategorie überprüfen
-		return kategorie.matches("[a-zA-Z]+") ? (3 <= kategorie.length() && kategorie.length() <= 32) : false;
+		return kategorie.matches("[a-zäöüßA-ZÄÖÜ]+") ? (3 <= kategorie.length() && kategorie.length() <= 32) : false;
 	}
 
 	public boolean checkEan(String ean) {
@@ -159,6 +159,20 @@ public class Artikel {
 		setPreisFromXML();
 		setEinheitFromXML();
 		setGrundpreisFromXML();
+	}
+	
+	public String[] toStringArray() {
+		String[] arr = new String[9];
+		arr[0] = this.getName();
+		arr[1] = this.getEan();
+		arr[2] = this.getKategorie();
+		arr[3] = this.getEinheit();
+		arr[4] = this.getPlu();
+		arr[5] = this.getGewicht();
+		arr[6] = this.getAnzahl();
+		arr[7] = this.getPreis();
+		arr[8] = this.getGrundpreis();
+		return arr;
 	}
 
 	/*

@@ -14,7 +14,7 @@
 	<article>
 		<name>gurke</name>
 		<ean>0000000000002</ean>
-		<kategorie>gemãŒse</kategorie>
+		<kategorie>gemüse</kategorie>
 		<einheit>g</einheit>
 		<plu>2</plu>
 		<gewicht>n</gewicht>
@@ -25,7 +25,7 @@
 	<article>
 		<name>milch</name>
 		<ean>0000000000003</ean>
-		<kategorie>getrã€nke</kategorie>
+		<kategorie>getränke</kategorie>
 		<einheit>l</einheit>
 		<plu>3</plu>
 		<gewicht>1,5</gewicht>

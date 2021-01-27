@@ -22,14 +22,14 @@ public class KategorieListe extends HashSet<String> {
 	}
 
 	public void addKategorie(String kategorie) {
-		if (kategorie.matches("[a-zA-Z]+") && (3 <= kategorie.length() && kategorie.length() <= 32)) {
+		if (kategorie.matches("[a-zäöüßA-ZÄÖÜ]+") && (3 <= kategorie.length() && kategorie.length() <= 32)) {
 			this.add(kategorie);
 		}
 		return;
 	}
 
 	public void addKategorie(Artikel article) {
-		if (article.getKategorie().matches("[a-zA-Z]+") && (3 <= article.getKategorie().length() && article.getKategorie().length() <= 32)) {
+		if ((article.getKategorie().matches("[a-zäöüßA-ZÄÖÜ]+")) && (3 <= article.getKategorie().length()) && (article.getKategorie().length() <= 32)) {
 			this.add(article.getKategorie());
 		}
 		return;
@@ -40,12 +40,14 @@ public class KategorieListe extends HashSet<String> {
 
 		return;
 	}
-
-	public void readKategorien(LinkedList<Artikel> artikelliste) {
-		for (Artikel a : artikelliste) {
-			this.addKategorie(a.getKategorie());
+	
+	public String[] toStringArray() {
+		String[] arr = new String[this.size()];
+		int count = 0;
+		for (String s : this) {
+			arr[count] = s;
 		}
-		return;
+		return arr;
 	}
 
 	public void printer() {
