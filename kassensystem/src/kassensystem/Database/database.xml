@@ -34,9 +34,20 @@
 		<grundpreis>1,99</grundpreis>
 	</article>
 	<article>
+		<name>schoko</name>
+		<ean>0000000000004</ean>
+		<kategorie>süßes</kategorie>
+		<einheit>g</einheit>
+		<plu>4444</plu>
+		<gewicht>200</gewicht>
+		<anzahl>300</anzahl>
+		<preis>1.49</preis>
+		<grundpreis>7.45</grundpreis>
+	</article>
+	<article>
 		<name>Schoko</name>
 		<ean>0000000000004</ean>
-		<kategorie>Süßes</kategorie>
+		<kategorie>null</kategorie>
 		<einheit>g</einheit>
 		<plu>4444</plu>
 		<gewicht>200</gewicht>

@@ -60,7 +60,7 @@ public class DatenSchreiber
 	{
 		try
 		{
-			FileWriter dbData = new FileWriter(System.getProperty("user.dir") + "/src/Database/database.xml");
+			FileWriter dbData = new FileWriter(System.getProperty("user.home") + "/Dokumente/Uni/SE/Projekt/SE_Java_Project/kassensystem/src/kassensystem/Database/database.xml");
 			dbData.write(xml);
 			dbData.close();
 		}

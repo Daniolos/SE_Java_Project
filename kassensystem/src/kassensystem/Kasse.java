@@ -1,6 +1,7 @@
 import java.io.File;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import Database.DatenSchreiber;
@@ -46,6 +47,8 @@ public class Kasse {
 			myReader.close();
 
 			System.out.println(Float.parseFloat("1.49"));
+			
+			System.out.println(Arrays.deepToString(b.toStringArray()));
 
 		} catch (FileNotFoundException e) {
 			System.out.println("An error occurred.");

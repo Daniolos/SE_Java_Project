@@ -49,9 +49,19 @@ public class Lager {
 
 	public void ArtikelHinzufuegen(Artikel article) {
 		articles.add(article); // Was passiert, wenn Artikel leer sind, wenn Artikel doppelt sind usw. (noch hinzuf.)
-		if (!kategorien.contains(article.getKategorie())) {	// Braucht man das überhaupt? Kategorien werden ja extra dazugefügt... oder?
-			kategorien.addKategorie(article);
+		//if (!kategorien.contains(article.getKategorie())) {	// Braucht man das überhaupt? Kategorien werden ja extra dazugefügt... oder?
+		//	kategorien.addKategorie(article);
+		//}
+	}
+	
+	public String[][] toStringArray() {
+		String[][] arr = new String[articles.size()][9];
+		int i = 0;
+		for (Artikel a : this.articles) {
+			arr[i] = a.toStringArray();
+			i++;
 		}
+		return arr;
 	}
 
 	public void print() {
