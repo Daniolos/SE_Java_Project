@@ -1,0 +1,23 @@
+{
+    "articles" :
+    [
+        {
+            "id" : 1,
+            "name" : "Banane",
+            "weight" : 0.1,
+            "measuring" : "weight",
+            "stock" : 1,
+            "price" : 0.2,
+            "sale" : 0.3,
+            "ean" : 123,
+            "hersteller" : ["heinz", "uschi"]
+        },
+        {
+            ...
+        }
+    ],
+    "company" : "Marcus Drews Company",
+    "year" : 2021,
+    "submission" : "31.01.2021",
+    "test" : [1, 2, 3]
+}
