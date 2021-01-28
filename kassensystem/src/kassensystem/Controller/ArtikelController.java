@@ -1,20 +1,34 @@
-//package Controller;
-//
-//import Parsing.Artikel;
-//import KonvertierArtikel;
-//
-//public class ArtikelController 
-//{
-//	private Artikel article;
-//	
-//	public ArtikelController(Artikel article)
-//	{	
-//		this.article = article;
-//	}
-//	
-//	public ArtikelController(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
-//	{	
-//		article = new Artikel(name, ean, kategorie, einheit, plu, gewicht, stringZuInt(anzahl), preis, grundpreis);
-//	}
-//}
-//
+package Controller;
+
+import Parsing.Artikel;
+
+public class ArtikelController extends KonvertierController
+{
+	private Artikel article;
+	
+	public ArtikelController(Artikel article)
+	{	
+		this.article = article;
+	}
+	
+	public ArtikelController(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
+	{	
+		article = new Artikel(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis);
+	}
+	
+	public void update(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
+	{
+		article.update(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis);
+	}
+	
+	public Artikel getArtikel()
+	{
+		return article;
+	}
+	
+	public void print() {
+		System.out.println(article.getName() + ", " + article.getEan() + ", " + article.getKategorie() + ", " + article.getEinheit() 
+				+ ", " + article.getPlu() + ", " + article.getGewicht() + ", " + article.getAnzahl() + ", " + article.getPreis() 
+				+ ", " + article.getGrundpreis());
+	}
+}
