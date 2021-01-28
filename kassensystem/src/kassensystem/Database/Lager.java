@@ -69,7 +69,7 @@ public class Lager {
 
 	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String plu,
 			String gewicht, String anzahl, String preis, String grundpreis) {
-		// �berpr�fen, ob name oder ean schon da ist / caps werden ignoriert
+		// überprüfen, ob name oder ean schon da ist / caps werden ignoriert
 
 		Boolean dublicate = false;
 
@@ -87,10 +87,10 @@ public class Lager {
 			// Float.parseFloat(preis), Float.parseFloat(grundpreis))
 		}
 		// else -> was soll sonst passieren?
-		// man k�nnte success- oder fail-meldung ausgeben (bool)
+		// man könnte success- oder fail-meldung ausgeben (bool)
 	}
 //	
-//	// �berladene Version f�r Article
+//	// Überladene Version für Article
 //	
 //	public void addArticle (Article art)
 //	{
