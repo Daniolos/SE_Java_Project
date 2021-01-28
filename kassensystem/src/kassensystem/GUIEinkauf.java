@@ -45,13 +45,14 @@ public class GUIEinkauf extends JFrame
 	
 	/**
 	 * 
-	 * @param Input - ein Flot, der den zu verändernden Betrag der Zwischensumme enthält
+	 * @param Input - ein Float, der den zu verändernden Betrag der Zwischensumme enthält
 	 */
 	private void changeZwischensumme (Float Input) {
 		zValue = zValue + Input;
 		zwischensumme.setText("Zwischensumme: "+zValue + " €");
 		}
 
+	
 
 	private GUIEinkauf() {
 		setLayout(new BorderLayout());
@@ -71,14 +72,15 @@ public class GUIEinkauf extends JFrame
 		
 		
 		String[] columnNames = 
-			{"Artikelname", "EAN", "Preis", "Preiseinheit", "Menge", "Mengeneinheit"};
+			{"Artikelname", "EAN","Stückpreis", "Stückzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
 			
 		Object[][] dataBestand = 
 		{												// Datensätze müssen später noch aus txt oder ähnlichen dateien geholt werden
-			{"Apfel", "0192992", 19.92f, "€", 200, "Stück"},
-			{"Tomate", "3432342", 2.34f, "€", 3, "Stück"},
-			{"Brot", "2345323",213.32f, "€", 7, "Stück"},
-			{"Rinderfilet", "6787383", 2498.33f, "€/Kilogramm" , 20000 , "Gramm"},
+			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
+			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
+			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
+			{"Rinderfilet", "6787383","n","n", "2498.33", "€/Kilogramm" , "20000" , "Gramm","Fleisch"},
+			{"Rinderwurst", "2327383","n","n", "298.13", "€/Kilogramm" , "200" , "Kilogramm","Fleisch"},
 		};
 		/*
 		 * Zur Übersichtlichkeit und Wartungsfreundlichkeit:
@@ -87,11 +89,14 @@ public class GUIEinkauf extends JFrame
 		
 		int NameSpalte = 0;
 		int EANSpalte = 1;
-		int PreisSpalte = 2;
-		int PreisEinheitSpalte = 3;
-		int MengeSpalte = 4;
-		int MengeEinheitSpalte = 5;
-		int EndpreisSpalte = 6; 		
+		int StkPreis = 2;
+		int StkZahl = 3;
+		int GrundPreis= 4;
+		int GPreisEinheitSpalte= 5;
+		int MengeSpalte= 6;
+		int MengeEinheitSpalte = 7;
+		// 8 wäre Kategorie, wird hier aber nicht genutzt
+		int EndpreisSpalte = 9; 		
 		
 		
 		Object[][] dataEinkauf = {};
@@ -132,17 +137,17 @@ public class GUIEinkauf extends JFrame
 		bestandsListePanel.add(scrollPane);
 	
 	
-		// Zum Sortieren (Filtern) später
+		// Zum späteren späteren Filtern
 		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
 		bestandsListe.setRowSorter(tr);	
 		
 		einkaufsListeModel.addColumn("Endpreis");
 		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMinWidth(0);	
 		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMaxWidth(0); //	--> um EAN in der Einkaufsliste zu verbergen
-		einkaufsListe.getColumnModel().getColumn(PreisSpalte).setMinWidth(0);	
-		einkaufsListe.getColumnModel().getColumn(PreisSpalte).setMaxWidth(0);
-		einkaufsListe.getColumnModel().getColumn(PreisEinheitSpalte).setMinWidth(0);	
-		einkaufsListe.getColumnModel().getColumn(PreisEinheitSpalte).setMaxWidth(0);
+		einkaufsListe.getColumnModel().getColumn(StkPreis).setMinWidth(0);	
+		einkaufsListe.getColumnModel().getColumn(StkPreis).setMaxWidth(0);
+		einkaufsListe.getColumnModel().getColumn(GPreisEinheitSpalte).setMinWidth(0);	
+		einkaufsListe.getColumnModel().getColumn(GPreisEinheitSpalte).setMaxWidth(0);
 		
 		
 		/**
@@ -153,88 +158,86 @@ public class GUIEinkauf extends JFrame
 		 * 
 		 * Handelt es sich um ein Produkt dessen Menge nicht in Stück angegeben ist, so wird ein extra Textfeld mit Button eingeblendet ("insertValue" und "addValueButton" zum bestätigen).
 		 * Mit diesen kann dann eine konkrete Menge durch den Nutzer angegeben werden.
-		 * 
+		 * Je nach Produkt und Preis-/Mengeneinheit wird entsprechend umgerechnet (um den Faktor "Mult"). Dieser wird zur Berechnung des endgültigen Preises für das Produkt und der Zwischensumme verwendet.
 		 * 
 		 */
 		addButton.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
+				
 				insertValue.setVisible(false);
 				addValueButton.setVisible(false);	
-				if ((bestandsListe.getValueAt(bestandsListe.getSelectedRow(), 5) == "Stück") & ((Integer)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte) > 0)) 
-				{
-					bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - 1, bestandsListe.getSelectedRow(), MengeSpalte);
-					Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
-					einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-					einkaufsListeModel.setValueAt(1, einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-					einkaufsListeModel.setValueAt(bestandsListe.getValueAt((Integer)bestandsListe.getSelectedRow(), PreisSpalte), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-					changeZwischensumme((Float)(bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisSpalte)));}
-					
-				else
-					{
-					if ((Integer)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte) > 0) {
-						insertValue.setVisible(true);
-						addValueButton.setVisible(true);
-						addValueButton.addActionListener(new ActionListener () 
+				if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkZahl) != "n") {
+						if (Integer.parseInt((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkZahl)) > 0)
 						{
-							public void actionPerformed(ActionEvent e) {
-								if (((Integer)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte) >= Integer.parseInt(insertValue.getText())) & Integer.parseInt(insertValue.getText()) > 0 ) {
-									if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte) == ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).substring(2,((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).length())) {
-										bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()), bestandsListe.getSelectedRow(), MengeSpalte);
-										Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
-										einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-										einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-										einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * ((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, PreisSpalte)), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-							
-									}
-									else {
+					
+						bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), StkZahl)) - 1), bestandsListe.getSelectedRow(), StkZahl);
+						Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
+						einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+						einkaufsListeModel.setValueAt("1", einkaufsListeModel.getRowCount() - 1, StkZahl);
+						einkaufsListeModel.setValueAt((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkPreis), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+						changeZwischensumme(Float.parseFloat((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkPreis)));}
+					}
+					else
+						{
+						if (Integer.parseInt((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) > 0) {
+							insertValue.setVisible(true);
+							addValueButton.setVisible(true);
+							addValueButton.addActionListener(new ActionListener () 
+							{
+								public void actionPerformed(ActionEvent e) {
+									if (Integer.parseInt(((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte))) >= Integer.parseInt(insertValue.getText()) && Integer.parseInt(insertValue.getText()) > 0 ) {
 										
-										float Mult = 10f;
-										/*
-										 * Hier werden bei den nicht-Stück Mengen die einzelnen Umrechnungen zwischen den Einheiten durchgeführt
-										 */
-										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Gramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Kilogramm")) {
-											Mult = 0.001f;
-										};
-										
-										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Kilogramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Gramm")) {
-											System.out.println("2");
-											Mult = 10f;
-										};
-										
-										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Liter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Milliliter")) {
-											System.out.println("3");
-											Mult = 10f;
-										};
-										
-										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), PreisEinheitSpalte)).contains("Liter")) {
-											System.out.println("4");
-											Mult = 0.001f;
-										};
-										bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()), bestandsListe.getSelectedRow(), MengeSpalte);
-										Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
-										einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-										einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-										einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Mult * ((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, PreisSpalte)), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-										changeZwischensumme((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte));
+										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).equals(((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).substring(2,((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).length()))) {
+											System.out.println("1");
+											bestandsListeModel.setValueAt(String.parseString(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()))), bestandsListe.getSelectedRow(), MengeSpalte);
+											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
+											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+											einkaufsListeModel.setValueAt(insertValue.getText(), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+								
+										}
+										else {
+											
+											float Mult = 10f;
+											/*
+											 * Hier werden bei den nicht-Stück Mengen die einzelnen Umrechnungen zwischen den Einheiten durchgeführt
+											 */
+											if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Gramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).contains("Kilogramm")) {
+												Mult = 0.001f;
+											};
+											
+											if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Kilogramm") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).contains("Gramm")) {
+												Mult = 10f;
+											};
+											
+											if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Liter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).contains("Milliliter")) {
+												Mult = 10f;
+											};
+											
+											if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).contains("Liter")) {
+												Mult = 0.001f;
+											};
+											bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()), bestandsListe.getSelectedRow(), MengeSpalte);
+											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
+											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Mult * ((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+											changeZwischensumme((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte));
+											insertValue.setVisible(false);
+											addValueButton.setVisible(false);
+										}
 									}
 								}
-							}
 						});
-					}
-				}
-			}
-		});
 		
-		/*
-		 * Diese Funktion löscht den Inhalt des Eingabefeldes "insertValue", sobald dieses mit der Maus angeklickt wird. 
+		/**
+		 * Dieser MouseListener löscht den Inhalt des Eingabefeldes "insertValue", sobald dieses mit der Maus angeklickt wird. 
 		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion "addValueButton" zu erhöhen. 
 		 * Beachte: Dieses wird nur angezeigt, wenn ein Produkt zur Einkaufsliste hinzugefügt werden soll, dessen Einheit nicht in "Stück" angegeben ist. (siehe auch "addButton"-Funktion)
 		 * 
 		 */
-		
-		
 		insertValue.addMouseListener(new MouseAdapter() 
 		{
 	        @Override
@@ -243,8 +246,24 @@ public class GUIEinkauf extends JFrame
 	            insertValue.setText("");	
 	        }
 		});
-		/*
-		 * Diese Funktion löscht einzelne Elemente aus der Einkaufsliste. Es wird immer das Element gelöscht das vom Nutzer ausgewählt wurde.
+		/**
+		 *  Dieser MouseListener löscht den Inhalt des Eingabefeldes "searchField", sobald dieses mit der Maus angeklickt wird. 
+		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion "addValueButton" zu erhöhen. 
+		 *  
+		 */
+		searchField.addMouseListener(new MouseAdapter() 
+		{
+	        @Override
+	        public void mouseClicked(MouseEvent e)
+	        {
+	        	searchField.setText("");	
+	        }
+		});
+		
+		/**
+		 * Dieser Actionlistener löscht einzelne Elemente aus der Einkaufsliste. Es wird immer das Element gelöscht das vom Nutzer ausgewählt wurde.
+		 * Dieser geht die gesamte Bestandsliste durch, bis das, im Bestand, zu reduzierende Produkt gefunden worden ist, dieses wird dann um den entsprechenden Betrag verringert.
+		 * 		Pro Stück jeweils um den Wert 1, bei nicht-Stück Mengen um den jeweiligen Betrag, um den das Produkt vorher hinzugefügt wurde.
 		 */
 		removeButton.addActionListener(new ActionListener() 
 		{
@@ -255,7 +274,7 @@ public class GUIEinkauf extends JFrame
 				{
 					i++;
 				}
-				if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), 5) == "Stück") {
+				if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkPreis) != "n") {
 					bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(i,MengeSpalte)) + 1, i, MengeSpalte);
 					}	
 					else {
@@ -266,8 +285,8 @@ public class GUIEinkauf extends JFrame
 				einkaufsListeModel.removeRow(einkaufsListe.getSelectedRow());
 				}
 			});
-		/*
-		 * 
+		/**
+		 * Funktioniert im Kern wie die Funktionalität des "removeButtons". Es wird zusätzlich für jedes Element über die gesamte Einkaufsliste itteriert, um jedes Element zu entfernen.
 		 */
 		removeAllButton.addActionListener(new ActionListener()  // Hier muss mit den nicht-Stück Menge noch etwas passieren
 		{
@@ -280,7 +299,7 @@ public class GUIEinkauf extends JFrame
 					{
 						j++;
 					}
-					if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), 5) == "Stück") {
+					if (bestandsListe.getValueAt(bestandsListe.getSelectedRow(), StkPreis) != "n") {
 					bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(j,MengeSpalte)) + 1, j, MengeSpalte);
 					}	
 					else {
@@ -293,18 +312,27 @@ public class GUIEinkauf extends JFrame
 					zValue = 0f;
 					}
 				});	
+		
+		/**
+		 * Nach dem Betätigen des "searchButtons" wird diese Suche durchgeführt.
+		 * Mittels eines RowFilters wird die Liste nach der Eingabe im "searchField" gefiltert. D.h., alle Artikel werden angezeigt, die den Suchtext enthalten. Ist keine Suche eingegeben, wird alles ungefiltert ausgegeben.
+		 */
 		searchButton.addActionListener(new ActionListener() {
 		      public void actionPerformed(ActionEvent e) {
-		        String text = searchField.getText();
-		        if (text.length() == 0) {
-		          tr.setRowFilter(null);
-		        } else {
-		          tr.setRowFilter(RowFilter.regexFilter(text));
-		        }
-		      }
+		  		String text = searchField.getText();
+		          if (text.length() == 0) {
+		            tr.setRowFilter(null);
+		          } else {
+		            tr.setRowFilter(RowFilter.regexFilter(text, NameSpalte, EANSpalte));
+		          }
+		  	}
 		});
+		
+	}
 	
-}	
+		
+		
+		
 	
 	public static void main(String[] args) 
 	{

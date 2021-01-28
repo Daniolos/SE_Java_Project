@@ -16,8 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
-public class GUIEinkauf extends JFrame
+public class GUITest extends JFrame
 	{
+	// https://www.javacodeexamples.com/convert-array-to-vector-in-java-example/3281 --> Array zu Vector
+	
 	private JLabel bestandsListeLabel;
 	private JLabel einkaufsListeLabel;
 	private JButton addButton;
@@ -26,15 +28,18 @@ public class GUIEinkauf extends JFrame
 	private JTable bestandsListe;
 	private JTable einkaufsListe;
 	
-		private GUIEinkauf() {
+	private GUITest() {
 		setLayout(new FlowLayout());
 		
-		String[] columnNames = {"Artikelname", "EAN", "Preis", "StÃ¼ckzahl"};
+		String[] columnNames = 
+			{"Artikelname", "EAN","Stückpreis", "Stückzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
 			
-		Object[][] dataBestand = {												// DatensÃ¤tze mÃ¼ssen spÃ¤ter noch aus txt oder Ã¤hnlichen dateien geholt werden
-					{"Apfel", "0192992", "19,92", 2},
-					{"Tomate", "3432342", "2,34", 3},
-					{"Brot", "2345323","213,32", 7},
+		Object[][] dataBestand = 
+		{												// Datensätze müssen später noch aus txt oder ähnlichen dateien geholt werden
+			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
+			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
+			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
+			{"Rinderfilet", "6787383","n","n", 2498.33f, "€/Kilogramm" , 20000 , "Gramm","Fleisch"},
 		};
 		Object[][] dataEinkauf = {};
 			
@@ -63,7 +68,7 @@ public class GUIEinkauf extends JFrame
 		this.getContentPane().add(addButton);
 		this.getContentPane().add(removeButton);
 		this.getContentPane().add(removeAllButton);
-		addButton.addActionListener(new ActionListener() {
+		/*addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), 3)) - 1, bestandsListe.getSelectedRow(), 3);
 				Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
@@ -97,11 +102,11 @@ public class GUIEinkauf extends JFrame
 				einkaufsListeModel.getDataVector().removeAllElements();
 				einkaufsListe.repaint();
 				}
-			});		
+			});		*/
 }	
 	
 	public static void main(String[] args) {
-		GUIEinkauf gui = new GUIEinkauf();
+		GUITest gui = new GUITest();
 		gui.setTitle("Einkaufsansicht");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gui.setExtendedState(JFrame.MAXIMIZED_BOTH);  //Fullscreen
