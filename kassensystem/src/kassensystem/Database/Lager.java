@@ -1,95 +1,96 @@
 package Database;
+
 import java.util.LinkedList;
 //import Parsing.EanVerifizierer;
 import Parsing.XMLParser;
 import Parsing.Artikel;
 import Parsing.EanVerifizierer;
 
-
-public class Lager 
-{
+public class Lager {
 	private String articleMarkup;
 	private LinkedList<Artikel> articles;
-	
-	public Lager (String xml)
-	{
-		articles = new LinkedList<Artikel>();	
+	private KategorieListe kategorien;
+
+	public Lager(String xml) {
+		articles = new LinkedList<Artikel>();
+		kategorien = new KategorieListe();
 		setAllArticlesFromString(xml);
 		fillLager();
+		for (Artikel a : articles) {
+			kategorien.addKategorie(a);
+		}
+		//TODO Print-Anweisungen entfernen
 		System.out.println(xml);
 		System.out.println(articleMarkup);
 	}
-	
+
 	// xml contains whole xml as String
-	
-	private void setAllArticlesFromString(String xml)
-	{
+
+	private void setAllArticlesFromString(String xml) {
 		articleMarkup = XMLParser.getChild(xml, "articles");
 	}
-	
-	private void fillLager ()
-	{
+
+	private void fillLager() {
 		String placeholder = "yqzxdf";
-		String replacedXMLString = articleMarkup.replaceAll("</article>\\s*<article>", "</article>" + placeholder + "<article>");
-		String [] art = replacedXMLString.split(placeholder);
-		for (String a : art)
-		{
-			if (!a.trim().equals(""))
-			{				
+		String replacedXMLString = articleMarkup.replaceAll("</article>\\s*<article>",
+				"</article>" + placeholder + "<article>");
+		String[] art = replacedXMLString.split(placeholder);
+		for (String a : art) {
+			if (!a.trim().equals("")) {
 				articles.add(new Artikel(a));
 			}
 		}
 	}
-	
-	public LinkedList<Artikel> getArtikel()
-	{
+
+	public LinkedList<Artikel> getArtikel() {
 		return articles;
 	}
-		
-	public void ArtikelHinzufuegen(Artikel article)
-	{
-		if (!article.getName().equals("") && !article.getEan().equals(""))
-			articles.add(article); //Was passiert, wenn Artikel leer sind, wenn Artikel doppelt sind
+
+	public KategorieListe getKategorien() {
+		return kategorien;
 	}
-	
-	public Boolean addAndCheck(Artikel article)
-	{
+
+	public void ArtikelHinzufuegen(Artikel article) {
+		if (!article.getName().equals("") && !article.getEan().equals(""))
+			articles.add(article); // Was passiert, wenn Artikel leer sind, wenn Artikel doppelt sind
+		// TODO Muss hier die Kategorie hinzugefÃ¼gt werden? Oder werden die nur separat
+		// hinzugefÃ¼gt?
+	}
+
+	public Boolean addAndCheck(Artikel article) {
 		ArtikelHinzufuegen(article);
-		for (Artikel art : articles)
-		{
+		for (Artikel art : articles) {
 			if (article.getName().equals(art.getName()) || article.getEan().equals(art.getEan()))
 				return true;
 		}
 		return false;
-		
+
 	}
-	
-	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
-	{
-		// überprüfen, ob name oder ean schon da ist / caps werden ignoriert
-		
+
+	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String plu,
+			String gewicht, String anzahl, String preis, String grundpreis) {
+		// ï¿½berprï¿½fen, ob name oder ean schon da ist / caps werden ignoriert
+
 		Boolean dublicate = false;
-		
-		for (Artikel article : articles)
-		{
-			if (new EanVerifizierer(ean).getformatierteEan().equals(article.getEan()))
-			{
+
+		for (Artikel article : articles) {
+			if (new EanVerifizierer(ean).getformatierteEan().equals(article.getEan())) {
 				dublicate = true;
 				break;
 			}
 		}
-		
-		if (!dublicate)
-		{
+
+		if (!dublicate) {
 			// stock-parsing kann Fehler hervorrufen, hier in try-catch abfangen
 			articles.add(new Artikel(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis));
-			//(name, ean, kategorie, einheit, plu, gewicht, Integer.parseInt(anzahl), Float.parseFloat(preis), Float.parseFloat(grundpreis))
+			// (name, ean, kategorie, einheit, plu, gewicht, Integer.parseInt(anzahl),
+			// Float.parseFloat(preis), Float.parseFloat(grundpreis))
 		}
-		//else -> was soll sonst passieren?
-		// man könnte success- oder fail-meldung ausgeben (bool)
+		// else -> was soll sonst passieren?
+		// man kï¿½nnte success- oder fail-meldung ausgeben (bool)
 	}
 //	
-//	// überladene Version für Article
+//	// ï¿½berladene Version fï¿½r Article
 //	
 //	public void addArticle (Article art)
 //	{
@@ -112,42 +113,44 @@ public class Lager
 //			articles.add(art);
 //		}
 //	}
-	
-	public Artikel search (String nameOrEan)
-	{
+
+	public Artikel search(String nameOrEan) {
 		EanVerifizierer eanVerifizierer = new EanVerifizierer(nameOrEan);
-		
-		for (Artikel article : articles)
-		{
-			if (eanVerifizierer.valideEan() ? article.getEan().equals(eanVerifizierer.getformatierteEan()) : article.getName().toLowerCase().equals(nameOrEan.toLowerCase()))
-			{
+
+		for (Artikel article : articles) {
+			if (eanVerifizierer.valideEan() ? article.getEan().equals(eanVerifizierer.getformatierteEan())
+					: article.getName().toLowerCase().equals(nameOrEan.toLowerCase())) {
 				return article;
 			}
 		}
-		
+
 		return new Artikel("");
 	}
-	
 
-	public void delete (String ean)
-	{
+	public void delete(String ean) {
 		EanVerifizierer eanVerifizierer = new EanVerifizierer(ean);
 		int index = 0;
-		for (Artikel article : articles)
-		{
-			if (article.getEan() == eanVerifizierer.getformatierteEan())
-			{
+		for (Artikel article : articles) {
+			if (article.getEan() == eanVerifizierer.getformatierteEan()) {
 				articles.remove(index);
 				break;
 			}
 			index++;
 		}
-	}	
+	}
 	
-	public void print()
-	{
-		for (Artikel article : articles)
-		{
+	public String[][] toStringArray() {
+		String[][] arr = new String[articles.size()][9];
+		int i = 0;
+		for (Artikel a : this.articles) {
+			arr[i] = a.toStringArray();
+			i++;
+		}
+		return arr;
+	}
+
+	public void print() {
+		for (Artikel article : articles) {
 			article.print();
 		}
 	}
