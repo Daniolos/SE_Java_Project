@@ -14,7 +14,7 @@
 	<article>
 		<name>gurke</name>
 		<ean>0000000000002</ean>
-		<kategorie>gem�se</kategorie>
+		<kategorie>gemüse</kategorie>
 		<einheit>g</einheit>
 		<plu>2</plu>
 		<gewicht>n</gewicht>
@@ -25,35 +25,13 @@
 	<article>
 		<name>milch</name>
 		<ean>0000000000003</ean>
-		<kategorie>getr�nke</kategorie>
+		<kategorie>getränke</kategorie>
 		<einheit>l</einheit>
 		<plu>3</plu>
 		<gewicht>1,5</gewicht>
 		<anzahl>50</anzahl>
 		<preis>2,99</preis>
 		<grundpreis>1,99</grundpreis>
-	</article>
-	<article>
-		<name>Schoko</name>
-		<ean>0000000000004</ean>
-		<kategorie>S��es</kategorie>
-		<einheit>g</einheit>
-		<plu>4444</plu>
-		<gewicht>200</gewicht>
-		<anzahl>300</anzahl>
-		<preis>1.49</preis>
-		<grundpreis>7.45</grundpreis>
-	</article>
-	<article>
-		<name>Gummibär</name>
-		<ean>0000000094445</ean>
-		<kategorie>Süßes</kategorie>
-		<einheit>g</einheit>
-		<plu>4444</plu>
-		<gewicht>200</gewicht>
-		<anzahl>300</anzahl>
-		<preis>1.49</preis>
-		<grundpreis>7.45</grundpreis>
 	</article>
 	<article>
 		<name>Gummibär</name>
