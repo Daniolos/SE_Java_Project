@@ -1,0 +1,20 @@
+package Controller;
+
+import Parsing.Benutzer;
+
+public class BenutzerController 
+{
+	private Boolean admin;
+	private Benutzer benutzer;
+	
+	public BenutzerController(Boolean admin)
+	{
+		benutzer = new Benutzer(admin);
+		this.admin = benutzer.admin();
+	}
+	
+	public Boolean istAdmin()
+	{
+		return admin;
+	}
+}
