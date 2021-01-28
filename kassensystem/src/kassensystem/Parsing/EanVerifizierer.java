@@ -1,7 +1,7 @@
 package Parsing;
 
 public class EanVerifizierer 
-{ // Extra Verifizierer für EAN, da EAN an mehreren Stellen benötigt wird: Beim Laden der XML, Anlegen von Artikeln, Konfiguration der PLU
+{ // Extra Verifizierer fÃ¼r EAN, da EAN an mehreren Stellen benÃ¶tigt wird: Beim Laden der XML, Anlegen von Artikeln, Konfiguration der PLU
 	
 	private String ean;
 	private String formatierteEan;
@@ -55,56 +55,3 @@ public class EanVerifizierer
 		return formatierteEan;
 	}
 }
-
-//public class EanValidator
-//{
-//	private String ean;
-//	private String formattedEan;
-//		
-//	public EanValidator (String ean)
-//	{
-//		setEan(ean);	
-//		setFormattedEan();
-//	}
-//	
-//	public Boolean isValid ()
-//	{
-//		return (ean.length() == 8 ||
-//				ean.length() == 13 ||
-//				ean.length() == 4 ||
-//				( ean.length() == 5 && String.valueOf(ean.charAt(0)).equals("9")) ) &&
-//				ean.matches("[0-9]+");
-//	}
-//
-//	private void setEan (String ean)
-//	{
-//		this.ean = ean;
-//	}
-//	
-//	private void setFormattedEan ()
-//	{
-//		if (isValid())
-//		{
-//			String left = "";
-//			for (int i = 0; i < 13 - ean.length(); i++)
-//			{
-//				left += "0";
-//			}
-//			formattedEan = left + ean;	
-//		}
-//		else
-//		{
-//			formattedEan = "";
-//		}
-//	}
-//	
-//	public String getEan ()
-//	{
-//		return ean;
-//	}
-//	
-//	public String getFormattedEan ()
-//	{
-//		return formattedEan;
-//	}
-//}
