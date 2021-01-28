@@ -54,7 +54,8 @@ public class GUIEinkauf extends JFrame
 
 	
 
-	private GUIEinkauf() {
+	private GUIEinkauf() 
+	{
 		setLayout(new BorderLayout());
 		JPanel einkaufsListePanel = new JPanel();
 		JPanel interactionsPanel = new JPanel();
@@ -191,7 +192,7 @@ public class GUIEinkauf extends JFrame
 										
 										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).equals(((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).substring(2,((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).length()))) {
 											System.out.println("1");
-											bestandsListeModel.setValueAt(String.parseString(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()))), bestandsListe.getSelectedRow(), MengeSpalte);
+											bestandsListeModel.setValueAt(String.parseString(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText())), bestandsListe.getSelectedRow(), MengeSpalte);
 											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
 											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
 											einkaufsListeModel.setValueAt(insertValue.getText(), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
@@ -328,7 +329,7 @@ public class GUIEinkauf extends JFrame
 		  	}
 		});
 		
-	}
+	
 	
 		
 		
