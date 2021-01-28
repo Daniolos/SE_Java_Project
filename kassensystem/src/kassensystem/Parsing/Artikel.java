@@ -5,16 +5,37 @@ import java.io.*;
 public class Artikel {
 	private XMLParser xmlParser;
 	private String name;
-	private String kategorie;
-	private String[] einheiten = { "g", "kg", "l", "ml", "p" };
-	private String einheit;
 	private String ean;
-	private String plu;
-	private String gewicht;
-	private String anzahl;
 	private String preis;
+	private String anzahl;
 	private String grundpreis;
+	// Grundpreiseinheit
+	private String preiseinheit; //kann auch n sein
+	private String gewicht;
+	private String[] einheiten = { "kg", "g", "l", "ml", "p" };
+	private String einheit;
+	private String kategorie;
+
+	// TODO Brauchen wir das überhaupt noch? -> PLU (habe überall PLU durch Preiseinheit ersetzt)
+
 	// TODO Preiseinheiten
+	public boolean checkPreiseinheit(String preiseinheit) {
+		try {
+			
+			if (preiseinheit.equals("n")) { return true; }
+			for (String s : einheiten) {
+				if (preiseinheit.contains(s)) {
+					return true;
+				}
+			}
+			return false;
+			
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			System.err.println("Ungültige Eingabe bei Preiseinheit.");
+			return false;
+		}
+	}
 
 	public boolean checkName(String name) {
 		return 2 <= name.length() && name.length() <= 32;
@@ -34,19 +55,6 @@ public class Artikel {
 			return true;
 		} else {
 			// TODO integrieren mit PLU
-			return false;
-		}
-	}
-
-	public boolean checkPlu(String plu) {
-
-		if (!plu.matches("[0-9]+")) {
-			return false;
-		}
-
-		if (plu.length() == 4 || plu.length() == 5) {
-			return true;
-		} else {
 			return false;
 		}
 	}
@@ -131,12 +139,12 @@ public class Artikel {
 		return false;
 	}
 
-	public Artikel(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl,
+	public Artikel(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht, String anzahl,
 			String preis, String grundpreis) {
 		setName(name);
 		setKategorie(kategorie);
 		setEan(ean);
-		setPlu(plu);
+		setPreiseinheit(preiseinheit);
 		setGewicht(gewicht);
 		setAnzahl(anzahl);
 		setPreis(preis);
@@ -157,12 +165,12 @@ public class Artikel {
 		setGrundpreisFromXML();
 	}
 
-	public void update(String name, String ean, String kategorie, String einheit, String plu, String gewicht,
+	public void update(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht,
 			String anzahl, String preis, String grundpreis) {
 		setName(name);
 		setKategorie(kategorie);
 		setEan(ean);
-		setPlu(plu);
+		setPlu(preiseinheit);
 		setAnzahl(anzahl);
 		setGewicht(gewicht);
 		setEinheit(einheit);
@@ -174,13 +182,13 @@ public class Artikel {
 		String[] arr = new String[9];
 		arr[0] = this.getName();
 		arr[1] = this.getEan();
-		arr[2] = this.getKategorie();
-		arr[3] = this.getEinheit();
-		arr[4] = this.getPlu();
-		arr[5] = this.getGewicht();
-		arr[6] = this.getAnzahl();
-		arr[7] = this.getPreis();
-		arr[8] = this.getGrundpreis();
+		arr[2] = this.getPreis();
+		arr[3] = this.getAnzahl();
+		arr[4] = this.getGrundpreis();
+		arr[5] = this.getPreiseinheit();
+		arr[6] = this.getGewicht();
+		arr[7] = this.getEinheit();
+		arr[8] = this.getKategorie();		
 		return arr;
 
 	}
@@ -190,6 +198,10 @@ public class Artikel {
 	 * 
 	 */
 
+	public String getPreiseinheit() {
+		return preiseinheit;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -218,10 +230,6 @@ public class Artikel {
 		return preis;
 	}
 
-	public String getPlu() {
-		return plu;
-	}
-
 	public String getGrundpreis() {
 		return grundpreis;
 	}
@@ -232,6 +240,10 @@ public class Artikel {
 	 * 
 	 */
 
+	public void setPreiseinheit(String preiseinheit) {
+		this.preiseinheit = checkPreiseinheit(preiseinheit) ? preiseinheit : "";
+	}
+	
 	public void setName(String name) {
 		this.name = checkName(name) ? name : "";
 	}
@@ -243,10 +255,6 @@ public class Artikel {
 
 	public void setEan(String ean) {
 		this.ean = new EanVerifizierer(ean).getformatierteEan();
-	}
-
-	public void setPlu(String plu) {
-		this.plu = checkPlu(plu) ? plu : "";
 	}
 
 	public void setGewicht(String gewicht) {
@@ -291,8 +299,8 @@ public class Artikel {
 		ean = xmlParser.getChild("ean");
 	}
 
-	private void setPluFromXML() {
-		plu = xmlParser.getChild("plu");
+	private void setPreiseinheitFromXML() {
+		preiseinheit = xmlParser.getChild("preiseinheit");
 	}
 
 	private void setGewichtFromXML() {
@@ -316,7 +324,7 @@ public class Artikel {
 	}
 
 	public void print() {
-		System.out.println(name + ", " + ean + ", " + kategorie + ", " + einheit + ", " + plu + ", " + gewicht + ", "
+		System.out.println(name + ", " + ean + ", " + kategorie + ", " + einheit + ", " + preiseinheit + ", " + gewicht + ", "
 				+ anzahl + ", " + preis + ", " + grundpreis);
 	}
 }

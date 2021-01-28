@@ -5,7 +5,7 @@
 		<ean>0000000000001</ean>
 		<kategorie>obst</kategorie>
 		<einheit>kg</einheit>
-		<plu>1</plu>
+		<preiseinheit>€/kg</preiseinheit>
 		<gewicht>20</gewicht>
 		<anzahl>n</anzahl>
 		<preis>39,8</preis>
@@ -16,7 +16,7 @@
 		<ean>0000000000002</ean>
 		<kategorie>gem�se</kategorie>
 		<einheit>g</einheit>
-		<plu>2</plu>
+		<preiseinheit>n</preiseinheit>
 		<gewicht>n</gewicht>
 		<anzahl>40</anzahl>
 		<preis>0,99</preis>
@@ -27,7 +27,7 @@
 		<ean>0000000000003</ean>
 		<kategorie>getr�nke</kategorie>
 		<einheit>l</einheit>
-		<plu>3</plu>
+		<preiseinheit>€/l</preiseinheit>
 		<gewicht>1,5</gewicht>
 		<anzahl>50</anzahl>
 		<preis>2,99</preis>
@@ -38,7 +38,7 @@
 		<ean>0000000000004</ean>
 		<kategorie>S��es</kategorie>
 		<einheit>g</einheit>
-		<plu>4444</plu>
+		<preiseinheit>€/100g</preiseinheit>
 		<gewicht>200</gewicht>
 		<anzahl>300</anzahl>
 		<preis>1.49</preis>
@@ -49,7 +49,7 @@
 		<ean>0000000094445</ean>
 		<kategorie>Süßes</kategorie>
 		<einheit>g</einheit>
-		<plu>4444</plu>
+		<preiseinheit>€/100g</preiseinheit>
 		<gewicht>200</gewicht>
 		<anzahl>300</anzahl>
 		<preis>1.49</preis>
@@ -60,7 +60,7 @@
 		<ean>0000000094445</ean>
 		<kategorie>Süßes</kategorie>
 		<einheit>g</einheit>
-		<plu>4444</plu>
+		<preiseinheit>€/100g</preiseinheit>
 		<gewicht>200</gewicht>
 		<anzahl>300</anzahl>
 		<preis>1.49</preis>

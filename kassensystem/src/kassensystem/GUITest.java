@@ -1,5 +1,3 @@
-package kassensystem;
-
 import java.awt.*;
 import java.util.Vector;
 import java.awt.event.*;
@@ -32,14 +30,14 @@ public class GUITest extends JFrame
 		setLayout(new FlowLayout());
 		
 		String[] columnNames = 
-			{"Artikelname", "EAN","Stückpreis", "Stückzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
+			{"Artikelname", "EAN","Stï¿½ckpreis", "Stï¿½ckzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
 			
 		Object[][] dataBestand = 
-		{												// Datensätze müssen später noch aus txt oder ähnlichen dateien geholt werden
-			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
-			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
-			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
-			{"Rinderfilet", "6787383","n","n", 2498.33f, "€/Kilogramm" , 20000 , "Gramm","Fleisch"},
+		{												// Datensï¿½tze mï¿½ssen spï¿½ter noch aus txt oder ï¿½hnlichen dateien geholt werden
+			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stï¿½ck","Obst"},
+			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stï¿½ck","Gemï¿½se"},
+			{"Brot", "2345323","213.32", "7","n","n","n", "Stï¿½ck","Backwaren"},
+			{"Rinderfilet", "6787383","n","n", 2498.33f, "ï¿½/Kilogramm" , 20000 , "Gramm","Fleisch"},
 		};
 		Object[][] dataEinkauf = {};
 			
@@ -53,13 +51,13 @@ public class GUITest extends JFrame
 		removeButton = new JButton("AusgewÃ¤hltes Element entfernen");
 		removeAllButton = new JButton("Alles entfernen");
 		
-		this.getContentPane().add(einkaufsListeLabel);											// Einkaufsliste zur graphischen Oberfläche hinzufügen
+		this.getContentPane().add(einkaufsListeLabel);											// Einkaufsliste zur graphischen Oberflï¿½che hinzufï¿½gen
 		einkaufsListe.setPreferredScrollableViewportSize(new Dimension(500,200));
 		einkaufsListe.setFillsViewportHeight(true);
 		JScrollPane scrollPane2 = new JScrollPane(einkaufsListe);
 		add(scrollPane2);
 		
-		this.getContentPane().add(bestandsListeLabel);											// Bestandsliste zur graphischen Oberfläche hinzufügen
+		this.getContentPane().add(bestandsListeLabel);											// Bestandsliste zur graphischen Oberflï¿½che hinzufï¿½gen
 		bestandsListe.setPreferredScrollableViewportSize(new Dimension(500,200));
 		bestandsListe.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(bestandsListe);

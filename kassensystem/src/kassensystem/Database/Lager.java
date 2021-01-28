@@ -67,7 +67,7 @@ public class Lager {
 
 	}
 
-	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String plu,
+	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String preiseinheit,
 			String gewicht, String anzahl, String preis, String grundpreis) {
 		// �berpr�fen, ob name oder ean schon da ist / caps werden ignoriert
 
@@ -82,7 +82,7 @@ public class Lager {
 
 		if (!dublicate) {
 			// stock-parsing kann Fehler hervorrufen, hier in try-catch abfangen
-			articles.add(new Artikel(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis));
+			articles.add(new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis));
 			// (name, ean, kategorie, einheit, plu, gewicht, Integer.parseInt(anzahl),
 			// Float.parseFloat(preis), Float.parseFloat(grundpreis))
 		}
