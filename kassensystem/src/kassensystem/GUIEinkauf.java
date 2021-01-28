@@ -51,8 +51,31 @@ public class GUIEinkauf extends JFrame
 		zValue = zValue + Input;
 		zwischensumme.setText("Zwischensumme: "+zValue + " €");
 		}
-
 	
+	/*private int getSelRow() {
+		int row=this.getjTable().getSelectedRow();
+		if (getjTable().getRowSorter()!=null) {
+		    row = getjTable().getRowSorter().convertRowIndexToModel(row);
+		}
+		
+	}*/
+	/**
+	 * 
+	 */
+	/*private void fillTable() {
+		DatenLeser bla = new DatenLeser();
+        XMLParser xml = new XMLParser(bla.getData());
+        String article = xml.getChild("articles");
+		Lager lager = new Lager(xml.getXML());
+		String[][] Array = lager.toStringArray();
+		for (int i = 0; i < Array.length; i++)
+		{
+			bestandsListeModel.addRow(Array[i]);
+		}
+	}*/
+
+	/*private saveBestand() {
+		}*/
 
 	private GUIEinkauf() 
 	{
@@ -162,6 +185,7 @@ public class GUIEinkauf extends JFrame
 		 * Je nach Produkt und Preis-/Mengeneinheit wird entsprechend umgerechnet (um den Faktor "Mult"). Dieser wird zur Berechnung des endgültigen Preises für das Produkt und der Zwischensumme verwendet.
 		 * 
 		 */
+		
 		addButton.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -189,15 +213,17 @@ public class GUIEinkauf extends JFrame
 							{
 								public void actionPerformed(ActionEvent e) {
 									if (Integer.parseInt(((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte))) >= Integer.parseInt(insertValue.getText()) && Integer.parseInt(insertValue.getText()) > 0 ) {
-										
+										int test=0;
 										if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).equals(((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).substring(2,((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).length()))) {
-											System.out.println("1");
-											bestandsListeModel.setValueAt(String.parseString(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText())), bestandsListe.getSelectedRow(), MengeSpalte);
+											
+											bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String)bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText())), bestandsListe.getSelectedRow(), MengeSpalte);
+											
 											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
 											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-											einkaufsListeModel.setValueAt(insertValue.getText(), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-								
+											einkaufsListeModel.setValueAt(String.valueOf(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
+											
 										}
 										else {
 											
@@ -220,18 +246,24 @@ public class GUIEinkauf extends JFrame
 											if (((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListe.getValueAt(bestandsListe.getSelectedRow(), GPreisEinheitSpalte)).contains("Liter")) {
 												Mult = 0.001f;
 											};
-											bestandsListeModel.setValueAt(((Integer) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte)) - Integer.parseInt(insertValue.getText()), bestandsListe.getSelectedRow(), MengeSpalte);
+											bestandsListeModel.setValueAt(String.valueOf((Integer.parseInt((String) bestandsListeModel.getValueAt(bestandsListe.getSelectedRow(), MengeSpalte))) - Integer.parseInt(insertValue.getText())), bestandsListe.getSelectedRow(), MengeSpalte);
 											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(bestandsListe.getSelectedRow()));
 											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(Integer.parseInt(insertValue.getText()) * Mult * ((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-											changeZwischensumme((Float)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte));
+											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText())), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText()) * Mult * (Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
+											bestandsListe.clearSelection();
 											insertValue.setVisible(false);
 											addValueButton.setVisible(false);
 										}
 									}
 								}
-						});
+							});			
+						}
+					}
+				}
+			}
+		);
 		
 		/**
 		 * Dieser MouseListener löscht den Inhalt des Eingabefeldes "insertValue", sobald dieses mit der Maus angeklickt wird. 
@@ -328,6 +360,7 @@ public class GUIEinkauf extends JFrame
 		          }
 		  	}
 		});
+		}
 		
 	
 	
@@ -346,3 +379,5 @@ public class GUIEinkauf extends JFrame
 		gui.setVisible(true);}});
 	}
 }
+
+
