@@ -54,7 +54,6 @@ public class GUIEinkauf extends JFrame
 	
 	private int getRow(JTable table) {
 		int row = table.getSelectedRow();
-		System.out.println(row);
 		if (table.getRowSorter() != null ) {
 		    row = table.getRowSorter().convertRowIndexToModel(row);
 		    }
@@ -312,12 +311,10 @@ public class GUIEinkauf extends JFrame
 					i++;
 		
 				}
-				System.out.println("2i: " + i);
-				if ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkPreis) != "n") {
+				if ((String)bestandsListeModel.getValueAt(i, StkPreis) != "n") {
 					bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) bestandsListeModel.getValueAt(i,StkZahl)) + 1), i, StkZahl);
 					}	
 					else {
-						System.out.println("2i: " + i);
 						bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) einkaufsListeModel.getValueAt(getRow(einkaufsListe),MengeSpalte)) + Integer.parseInt((String) bestandsListeModel.getValueAt(i,MengeSpalte))), i, MengeSpalte);
 					}
 				
