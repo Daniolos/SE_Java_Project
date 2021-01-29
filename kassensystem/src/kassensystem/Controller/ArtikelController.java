@@ -11,14 +11,14 @@ public class ArtikelController extends KonvertierController
 		this.article = article;
 	}
 	
-	public ArtikelController(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
+	public ArtikelController(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht, String anzahl, String preis, String grundpreis)
 	{	
-		article = new Artikel(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis);
+		article = new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis);
 	}
 	
-	public void update(String name, String ean, String kategorie, String einheit, String plu, String gewicht, String anzahl, String preis, String grundpreis)
+	public void update(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht, String anzahl, String preis, String grundpreis)
 	{
-		article.update(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis);
+		article.update(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis);
 	}
 	
 	public Artikel getArtikel()
@@ -28,7 +28,7 @@ public class ArtikelController extends KonvertierController
 	
 	public void print() {
 		System.out.println(article.getName() + ", " + article.getEan() + ", " + article.getKategorie() + ", " + article.getEinheit() 
-				+ ", " + article.getPlu() + ", " + article.getGewicht() + ", " + article.getAnzahl() + ", " + article.getPreis() 
+				+ ", " + article.getPreiseinheit() + ", " + article.getGewicht() + ", " + article.getAnzahl() + ", " + article.getPreis() 
 				+ ", " + article.getGrundpreis());
 	}
 }

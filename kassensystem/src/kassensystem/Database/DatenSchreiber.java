@@ -59,7 +59,7 @@ public class DatenSchreiber
 		xmlString += "\t\t<ean>" + article.getEan() + "</ean>\n";
 		xmlString += "\t\t<kategorie>" + article.getKategorie() + "</kategorie>\n";
 		xmlString += "\t\t<einheit>" + article.getEinheit() + "</einheit>\n";
-		xmlString += "\t\t<plu>" + article.getPlu() + "</plu>\n";
+		xmlString += "\t\t<preiseinheit>" + article.getPreiseinheit() + "</preiseinheit>\n";
 		xmlString += "\t\t<gewicht>" + article.getGewicht() + "</gewicht>\n";
 		xmlString += "\t\t<anzahl>" + article.getAnzahl() + "</anzahl>\n";
 		xmlString += "\t\t<preis>" + article.getPreis() + "</preis>\n";

@@ -52,10 +52,8 @@ public class Lager {
 
 	public void ArtikelHinzufuegen(Artikel article) {
 		if (!article.getName().equals("") && !article.getEan().equals(""))
-			articles.add(article); // Was passiert, wenn Artikel leer sind, wenn Artikel doppelt sind
-		// TODO Muss hier die Kategorie hinzugefügt werden? Oder werden die nur separat
-		// hinzugefügt?
-	}
+			articles.add(article); 
+		}
 
 	public Boolean addAndCheck(Artikel article) {
 		ArtikelHinzufuegen(article);
@@ -67,7 +65,7 @@ public class Lager {
 
 	}
 
-	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String plu,
+	public void ArtikelHinzufuegen(String name, String ean, String kategorie, String einheit, String preiseinheit,
 			String gewicht, String anzahl, String preis, String grundpreis) {
 		// überprüfen, ob name oder ean schon da ist / caps werden ignoriert
 
@@ -82,8 +80,8 @@ public class Lager {
 
 		if (!dublicate) {
 			// stock-parsing kann Fehler hervorrufen, hier in try-catch abfangen
-			articles.add(new Artikel(name, ean, kategorie, einheit, plu, gewicht, anzahl, preis, grundpreis));
-			// (name, ean, kategorie, einheit, plu, gewicht, Integer.parseInt(anzahl),
+			articles.add(new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis));
+			// (name, ean, kategorie, einheit, preiseinheit, gewicht, Integer.parseInt(anzahl),
 			// Float.parseFloat(preis), Float.parseFloat(grundpreis))
 		}
 		// else -> was soll sonst passieren?
