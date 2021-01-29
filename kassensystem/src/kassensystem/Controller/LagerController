@@ -16,7 +16,7 @@ public class LagerController
 	{
 		Artikel article = new Artikel(artikelController.getArtikel().getName(), artikelController.getArtikel().getEan(), 
 				artikelController.getArtikel().getKategorie(), artikelController.getArtikel().getEinheit(), 
-				artikelController.getArtikel().getPlu(), artikelController.getArtikel().getGewicht(), 
+				artikelController.getArtikel().getPreiseinheit(), artikelController.getArtikel().getGewicht(), 
 				artikelController.getArtikel().getAnzahl(), artikelController.getArtikel().getPreis(), 
 				artikelController.getArtikel().getGrundpreis());
 		
