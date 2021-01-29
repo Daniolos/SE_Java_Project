@@ -23,7 +23,10 @@ public class DatenSchreiber {
 	private String xml;
 
 	/**
-	 * Konstruktor für die Klasse. TODO
+	 * Konstruktor für die Klasse. Alle Datenelemente - bis auf das Lager - werden
+	 * initialisiert: ErsteZeile enthält den XML-Header, articles wird mit den
+	 * Beginn- und Abschluss-Tags um das Lager in der XML-Datei initialisiert und
+	 * xml konkateniert beides.
 	 */
 	public DatenSchreiber() {
 		setErsteZeile();
@@ -32,9 +35,12 @@ public class DatenSchreiber {
 	}
 
 	/**
-	 * überladener Konstruktor für diese Klasse.
+	 * überladener Konstruktor für diese Klasse. Alle Datenelemente dieser Klasse
+	 * werden initialisiert, mittels des übergebenen Lagers. this.xml enthält die
+	 * fertige XML-Datei (als String), die mit dem Aufruf der Methode Schreiben() in
+	 * die Datei geschrieben werden kann.
 	 * 
-	 * @param lager
+	 * @param Lager enthält alle Artikel in Form einer LinkedList<Artikel>
 	 */
 	public DatenSchreiber(Lager lager) {
 		this.lager = lager;

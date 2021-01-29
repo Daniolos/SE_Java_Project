@@ -8,7 +8,7 @@ import Parsing.EanVerifizierer;
 
 /**
  * 
- * @author Felix Schulz
+ * @author Felix Schulz, Philomena Moek
  *
  */
 

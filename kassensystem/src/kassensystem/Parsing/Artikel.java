@@ -4,7 +4,7 @@ import java.io.*;
 
 /**
  * 
- * @author Philomena Moek
+ * @author Felix Schulz, Philomena Moek
  * 
  */
 

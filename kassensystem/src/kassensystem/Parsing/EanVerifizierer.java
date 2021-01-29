@@ -2,7 +2,7 @@ package Parsing;
 
 /**
  * 
- * @author Felix Schulz
+ * @author Felix Schulz, Philomena Moek
  *
  */
 

@@ -13,10 +13,6 @@ import Parsing.Artikel;
 
 public class KategorieListe extends HashSet<String> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5598320182398998496L;
 
 	/**
 	 * Methode um zu überprüfen, ob eine Kategorie zulässig ist, also in diesem

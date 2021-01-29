@@ -2,6 +2,11 @@ package Controller;
 
 import Parsing.Artikel;
 
+/**
+ * 
+ * @author Felix Schulz
+ *
+ */
 public class ArtikelController extends KonvertierController
 {
 	private Artikel article;
