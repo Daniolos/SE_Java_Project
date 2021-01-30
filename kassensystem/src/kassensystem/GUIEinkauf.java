@@ -1,6 +1,7 @@
 package kassensystem;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Vector;
 import java.awt.event.*;
 import java.awt.event.ItemListener;
@@ -9,6 +10,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.table.*;
+
+import kassensystem.Database.DatenLeser;
+import kassensystem.Database.DatenSchreiber;
+import kassensystem.Database.Lager;
+import kassensystem.Parsing.Artikel;
+import kassensystem.Parsing.XMLParser;
+
 import javax.swing.event.*;
 import java.awt.Color;
 import java.lang.Math.*;
@@ -31,6 +39,7 @@ public class GUIEinkauf extends JFrame
 	private JTextArea mengeHinweisArea;
 	private JTextArea AbschlussArea;
 	private JTextArea ErrorArea;
+	private JTextArea BlankSpace;
 	private JLabel zwischensumme;
 	private JButton addButton;
 	private JButton addValueButton;
@@ -39,13 +48,22 @@ public class GUIEinkauf extends JFrame
 	private JButton einkaufAbschliessenButton;
 	private JButton WechelgeldBerechnenButton;
 	private JButton einkaufEndgueltigAbschliessenButton;
+	private JButton switchScreensButton;
 	private JTable bestandsListe;
 	private JTable einkaufsListe;
 	private JTextField insertValue;
 	private JTextField searchField;
 	private JTextField BarGeldField;
 	private float zValue = 0f;
+	private Lager lager;
 
+	
+	/*
+	 * Zur Übersichtlichkeit und Wartungsfreundlichkeit:
+	 * Falls sich die Reihenfolge der Spalten nachträglich ändern sollte, muss dies nur hier und nicht im gesamten Code korrigiert werden.
+	 * 
+	 * Die Endpreisspalte ist immer die letzte Spalte, nur bei einkausListe(-Model) verwendbar!!!!
+	 */
 	int NameSpalte = 0;
 	int EANSpalte = 1;
 	int StkPreis = 2;
@@ -57,7 +75,7 @@ public class GUIEinkauf extends JFrame
 	int KategorieSpalte = 8;
 	int EndpreisSpalte = 9; 	
 	
-	//BildschirmauflÃ¶sung des Nutzers ermitteln um das Fenster und die Elemente dynamisch anpassen
+	//Bildschirmauflösung des Nutzers ermitteln um das Fenster und die Elemente dynamisch anpassen
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	double screenWidth = screenSize.getWidth();
 	double screenHeight = screenSize.getHeight();
@@ -65,16 +83,23 @@ public class GUIEinkauf extends JFrame
 	
 	/**
 	 * Diese Funktion aktualisiert die Zwischensumme, welche in der Variable zValue gespeichert wird, um den Wert "Input".
-	 * AnschlieÃŸend wird der Wert noch auf 2 Nachkommastellen gerundet.
-	 * @param Input - ein Float, der den zu verÃ¤ndernden Betrag der Zwischensumme enthÃ¤lt
+	 * Anschließend wird der Wert noch auf 2 Nachkommastellen gerundet.
+	 * @param Input - ein Float, der den zu verändernden Betrag der Zwischensumme enthält
 	 */
 	private void changeZwischensumme (Float Input) {
 		zValue = zValue + Input;
 		zValue = Math.round(zValue * 100);
 		zValue = zValue / 100;
-		zwischensumme.setText("Zwischensumme: "+zValue + " â‚¬");
+		zwischensumme.setText("Zwischensumme: "+zValue + " €");
 		}
-	
+	/**
+	 * Die Funktion ermittelt die Ware Zeile des asugewählten Artikels.
+	 * Dies wird benötigt, um nach dem Filtern der Liste auch den korrekten Index der Artikelzeile zu erhalten,
+	 *  da sonst bei einer gefilterten Liste der Index der gefilterten Liste genutzt wird, um den Artikel in der ungefilterten Liste zu identifizieren.
+	 * 
+	 * @param table - die Tabelle, in der die Zeile des Artikels enthalten ist
+	 * @return ein Integer, der den Wert enthält, an dem der Artikel ist
+	 */
 	private int getRow(JTable table) {
 		int row = table.getSelectedRow();
 		if (table.getRowSorter() != null ) {
@@ -82,78 +107,84 @@ public class GUIEinkauf extends JFrame
 		    }
 		return row;
 	}
+	
 	/**
+	 *  Mit dem veränderten Bestand (effektiv die Einkausliste) wird die xml auf den aktuellen Stand gebracht. 
+	 * Also alle Artikel die auf der Einkaufsliste sind, werden nach und nach von der xml Datei in Menge oder Stückzahl (kommt auf den Artikel an) reduziert.
 	 * 
+	 * @param daten - enthält die Daten, die abgespeichert werden sollen, findet hier nur Verwendung mit dem Einkaufslistenmodell.
 	 */
-	/*private void fillTable() {
-		DatenLeser bla = new DatenLeser();
-        XMLParser xml = new XMLParser(bla.getData());
-        String article = xml.getChild("articles");
-		Lager lager = new Lager(xml.getXML());
-		String[][] Array = lager.toStringArray();
-		for (int i = 0; i < Array.length; i++)
+	private void saveBestand(DefaultTableModel daten) 
+	 {
+		for (int i = 0; i < daten.getRowCount(); i++)
 		{
-			bestandsListeModel.addRow(Array[i]);
+			Artikel article = lager.search((String)daten.getValueAt(i, EANSpalte));
+			
+			
+			try 
+			{
+			if (!article.getAnzahl().equals("n"))
+			{
+				float merke = Float.parseFloat(article.getAnzahl());
+				article.setAnzahl(String.valueOf(merke -Float.parseFloat((String)daten.getValueAt(i, StkZahl))));
+				continue;
+			}
+			
+			float merke = Float.parseFloat(article.getGewicht());
+			article.setGewicht(String.valueOf(merke -Float.parseFloat((String)daten.getValueAt(i, MengeSpalte))));
+			continue;
+			}
+			catch (NumberFormatException e)
+			{
+				e.printStackTrace();
+			}
 		}
-	}*/
-
-	/*private saveBestand() 
-	 * {
-	 * }
-	 */
+	 }
 
 	private GUIEinkauf() 
 	{
-		
 		//Initialisierung aller graphischen Elemente
 		setLayout(new BorderLayout());
 		JPanel einkaufsListePanel = new JPanel();
 		JPanel interactionsPanel = new JPanel();
 		JPanel interactionsPanelAbschluss = new JPanel();
 		JPanel bestandsListePanel = new JPanel();
-		addButton = new JButton("HinzufÃ¼gen");
-		removeButton = new JButton("AusgewÃ¤hltes Element entfernen");
+		addButton = new JButton("Hinzufügen");
+		removeButton = new JButton("Ausgewähltes Element entfernen");
 		removeAllButton = new JButton("Alles entfernen");
 		insertValue = new JTextField("Hier Wert eingeben. ");
 		mengeHinweisArea = new JTextArea("Beachte! \nDie Menge muss in der Einheit angegeben werden, wie diese auch ein der Bestandsliste in der Spalte Menge angegeben ist. \nKommata bitte als Punkt angeben. (z.B. 2.3)");
 		addValueButton = new JButton("Menge eingeben");
-		zwischensumme = new JLabel("Zwischensumme: "+ zValue +" â‚¬");
+		zwischensumme = new JLabel("Zwischensumme: "+ zValue +" €");
 		searchField = new JTextField("Suchwort: ");
 		BarGeldField = new JTextField("erhaltene Bargeldsumme eingeben");
-		hinweisArea = new JTextArea("Suchefelder werden durch hineinklicken automatisch gelÃ¶scht.");
+		hinweisArea = new JTextArea("Suchefelder werden durch hineinklicken automatisch gelöscht.");
 		AbschlussArea = new JTextArea("Endsumme, Wechselgeld");
 		ErrorArea = new JTextArea("");
-		einkaufAbschliessenButton = new JButton("Einkauf abschlieÃŸen.");
+		einkaufAbschliessenButton = new JButton("Einkauf abschließen.");
 		WechelgeldBerechnenButton = new JButton("Wechselgeld berechnen");
-		einkaufEndgueltigAbschliessenButton = new JButton("Einkauf endgÃ¼ltig abschlieÃŸen und neuen Einkauf starten.");
-		
+		einkaufEndgueltigAbschliessenButton = new JButton("Einkauf endgültig abschließen und neuen Einkauf starten.");
+		switchScreensButton = new JButton("Zur Admin-Ansicht");
+		BlankSpace = new JTextArea("");
 	
 		
-		
+		//Benennung der Spaltennamen
 		String[] columnNames = 
-			{"Artikelname", "EAN","StÃ¼ckpreis", "StÃ¼ckzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
-		/*
-		 * Zur Ãœbersichtlichkeit und Wartungsfreundlichkeit:
-		 * Die Endpreisspalte ist immer die letzte Spalte, nur bei einkausListe(-Model) verwendbar!!!!
-		 */
-		
-		
-		
+			{"Artikelname", "EAN","Stückpreis", "Stückzahl", "Grundpreis", "Grundpreiseinheit", "Menge", "Mengeneinheit","Kategorie"};
 		
 		Object[][] dataBestand = 
-		{											
-			{"Apfel", "0192992", "19.92", "200","n","n","n", "StÃ¼ck","Obst"},
-			{"Tomate", "3432342", "2.34", "3","n","n","n", "StÃ¼ck","GemÃ¼se"},
-			{"Brot", "2345323","213.32", "7","n","n","n", "StÃ¼ck","Backwaren"},
-			{"Rinderfilet", "6787383","n","n", "2498.33", "â‚¬/Kilogramm" , "20000" , "Gramm","Fleisch"},
-			{"Rinderwurst", "2327383","n","n", "298.13", "â‚¬/100 Gramm" , "200" , "Kilogramm","Fleisch"},
+		{				
+		{"Banane", "0202022", "19.23", "n", "18.23","g", "233", "kg", "Obst"}
+//			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
+//			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
+//			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
+//			{"Rinderfilet", "6787383","n","n", "2498.33", "€/Kilogramm" , "20000" , "Gramm","Fleisch"},
+//			{"Rinderwurst", "2327383","n","n", "298.13", "€/100 Gramm" , "200" , "Kilogramm","Fleisch"},
 		};
-	
-		
-		
 		Object[][] dataEinkauf = {};
 		
 		
+		// Hier wird die Einkaufsliste inkl. Scrollbalken und dazugehörigem Modell definiert 
 		this.getContentPane().add(einkaufsListePanel, BorderLayout.WEST);
 		einkaufsListePanel.setBorder(BorderFactory.createTitledBorder("Einkaufsliste"));
 		DefaultTableModel einkaufsListeModel = new DefaultTableModel(dataEinkauf, columnNames);
@@ -163,7 +194,7 @@ public class GUIEinkauf extends JFrame
 		JScrollPane scrollPane2 = new JScrollPane(einkaufsListe);
 		einkaufsListePanel.add(scrollPane2);
 	
-		
+		// Hier sind alle Elemente des zentralen Abschluss-Interaktionspanels, dieses wird erst beim Einkaufsabschluss sichtbar	
 		this.getContentPane().add(interactionsPanelAbschluss, BorderLayout.CENTER);
 		interactionsPanelAbschluss.setLayout(new GridLayout(15,1,5,5));
 		interactionsPanelAbschluss.setVisible(false);
@@ -177,7 +208,7 @@ public class GUIEinkauf extends JFrame
 		ErrorArea.setBackground(interactionsPanel.getBackground());
 		interactionsPanelAbschluss.add(einkaufEndgueltigAbschliessenButton);
 	
-				
+		// Hier sind alle Elemente des zentralen Interaktionspanels	
 		this.getContentPane().add(interactionsPanel, BorderLayout.CENTER);
 		interactionsPanel.setLayout(new GridLayout(15,1,5,5));
 		interactionsPanel.setBorder(BorderFactory.createTitledBorder("Interaktionen"));
@@ -186,20 +217,23 @@ public class GUIEinkauf extends JFrame
 		interactionsPanel.add(removeAllButton);
 		interactionsPanel.add(insertValue);
 		interactionsPanel.add(mengeHinweisArea);
-		mengeHinweisArea.setBackground(interactionsPanel.getBackground());
-		mengeHinweisArea.setForeground(Color.red);
 		interactionsPanel.add(addValueButton);
 		interactionsPanel.add(searchField);
 		interactionsPanel.add(hinweisArea);
 		interactionsPanel.add(einkaufAbschliessenButton);
 		interactionsPanel.add(zwischensumme);
+		interactionsPanel.add(BlankSpace);
+		interactionsPanel.add(switchScreensButton);
 		hinweisArea.setEditable(false);
+		BlankSpace.setBackground(interactionsPanel.getBackground());
 		hinweisArea.setBackground(interactionsPanel.getBackground());
 		insertValue.setVisible(false);
 		addValueButton.setVisible(false);
 		mengeHinweisArea.setVisible(false);
+		mengeHinweisArea.setBackground(interactionsPanel.getBackground());
+		mengeHinweisArea.setForeground(Color.red);		
 		
-		
+		// Hier wird die Bestandsliste inkl. Scrollbalken und dazugehörigem Modell definiert 
 		this.getContentPane().add(bestandsListePanel, BorderLayout.EAST);
 		bestandsListePanel.setBorder(BorderFactory.createTitledBorder("Bestandsliste"));
 		DefaultTableModel bestandsListeModel = new DefaultTableModel(dataBestand, columnNames);	// neue Objekte erzeugen
@@ -208,15 +242,28 @@ public class GUIEinkauf extends JFrame
 		bestandsListe.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(bestandsListe);
 		bestandsListePanel.add(scrollPane);
-	
-	
-		// Zum spÃ¤teren spÃ¤teren Filtern
+		
+		// Hier werden alle Artikel aus der xml-Datei ausgelesen
+		DatenLeser bla = new DatenLeser();
+	    XMLParser xml = new XMLParser(bla.getData());
+	    String article = xml.getChild("articles");
+		lager = new Lager(xml.getXML());
+		String[][] Array = lager.toStringArray();
+		for (int i = 0; i < Array.length; i++)
+		{
+			bestandsListeModel.addRow(Array[i]);
+		}
+			
+		// Zum späteren späteren Filtern
 		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
 		bestandsListe.setRowSorter(tr);	
 		
+		// Hier wird für die Einkaufsliste eine zusätzliche Spalte hinzugefügt, die immer die den "Endpreis", also den Preis, mit dem das Produkt gemeinsam mit seiner Menge preislich gewichtet wird.
 		einkaufsListeModel.addColumn("Endpreis");
+		
+		//Alle Spalten ausblenden, die im Einkaufsbildschirm unwichtig sind
 		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMinWidth(0);	
-		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMaxWidth(0); //	--> um EAN in der Einkaufsliste zu verbergen
+		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMaxWidth(0);
 		einkaufsListe.getColumnModel().getColumn(StkPreis).setMinWidth(0);	
 		einkaufsListe.getColumnModel().getColumn(StkPreis).setMaxWidth(0);
 		einkaufsListe.getColumnModel().getColumn(StkZahl).setMinWidth(0);	
@@ -226,14 +273,14 @@ public class GUIEinkauf extends JFrame
 		
 		
 		/**
-		 * Hier wird der "addButton" mit seinen Funktionen definiert. Dieser Ã¼bertrÃ¤gt bei Benutzung die ausgewÃ¤hlte Zeile der Bestandsliste in die Einkaufsliste.
-		 * Anfangs wird auÃŸerdem direkt abgefangen, dass der Benutzer nicht mehr Artikel Ã¼bertragen kann, als vorhanden sind.
+		 * Hier wird der "addButton" mit seinen Funktionen definiert. Dieser überträgt bei Benutzung die ausgewählte Zeile der Bestandsliste in die Einkaufsliste.
+		 * Anfangs wird außerdem direkt abgefangen, dass der Benutzer nicht mehr Artikel übertragen kann, als vorhanden sind.
 		 * 
-		 * Handelt es sich um ein Produkt dessen Menge in "StÃ¼ck" angegeben wird, wird pro Mausklick je ein Produkt Ã¼bernommen und einzeln in der Einkaufsliste aufgefÃ¼hrt.
+		 * Handelt es sich um ein Produkt dessen Menge in "Stück" angegeben wird, wird pro Mausklick je ein Produkt übernommen und einzeln in der Einkaufsliste aufgeführt.
 		 * 
-		 * Handelt es sich um ein Produkt dessen Menge nicht in StÃ¼ck angegeben ist, so wird ein extra Textfeld mit Button eingeblendet ("insertValue" und "addValueButton" zum bestÃ¤tigen).
+		 * Handelt es sich um ein Produkt dessen Menge nicht in Stück angegeben ist, so wird ein extra Textfeld mit Button eingeblendet ("insertValue" und "addValueButton" zum bestätigen).
 		 * Mit diesen kann dann eine konkrete Menge durch den Nutzer angegeben werden.
-		 * Je nach Produkt und Preis-/Mengeneinheit wird entsprechend umgerechnet (um den Faktor "Mult"). Dieser wird zur Berechnung des endgÃ¼ltigen Preises fÃ¼r das Produkt und der Zwischensumme verwendet.
+		 * Je nach Produkt und Preis-/Mengeneinheit wird entsprechend umgerechnet (um den Faktor "Mult"). Dieser wird zur Berechnung des endgültigen Preises für das Produkt und der Zwischensumme verwendet.
 		 * 
 		 */
 		addButton.addActionListener(new ActionListener() 
@@ -244,14 +291,14 @@ public class GUIEinkauf extends JFrame
 				insertValue.setVisible(false);
 				addValueButton.setVisible(false);	
 				if (bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl) != "n") {
-						if (Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) > 0)
-						{
-						bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) - 1), getRow(bestandsListe), StkZahl);
-						Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
-						einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-						einkaufsListeModel.setValueAt("1", einkaufsListeModel.getRowCount() - 1, StkZahl);
-						einkaufsListeModel.setValueAt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkPreis), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-						changeZwischensumme(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkPreis)));}
+					if (Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) > 0)
+					{
+					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) - 1), getRow(bestandsListe), StkZahl);
+					Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
+					einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+					einkaufsListeModel.setValueAt("1", einkaufsListeModel.getRowCount() - 1, StkZahl);
+					einkaufsListeModel.setValueAt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkPreis), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+					changeZwischensumme(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkPreis)));}
 				}
 				
 					else
@@ -263,55 +310,18 @@ public class GUIEinkauf extends JFrame
 							addValueButton.addActionListener(new ActionListener () 
 							{
 								public void actionPerformed(ActionEvent e) {
-									if (Float.parseFloat(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) >= Float.parseFloat(insertValue.getText()) && Float.parseFloat(insertValue.getText()) > 0 ) {
-										if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).equals(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).substring(2,((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).length()))) {
-											bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) - Float.parseFloat(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
-											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
-											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-											einkaufsListeModel.setValueAt(String.valueOf(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
-										}
-										else {
-											
-											float Mult = 10f;
-											/*
-											 * Hier werden bei den nicht-StÃ¼ck Mengen die einzelnen Umrechnungen zwischen den Einheiten durchgefÃ¼hrt
-											 * "Mult" dient hierbei als Umrechnungsfaktor
-											 */
-											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Gramm") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Kilogramm")) {
-												// Umrechnung: Artikelmenge in Gramm --> Preisberechnung in â‚¬/kg (Faktor 0,001)
-												Mult = 0.001f;
-											};
-											
-											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Kilogramm") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Gramm")) {
-												// Umrechnung: Artikelmenge in Kilogramm --> Preisberechnung in â‚¬/100 Gramm (Faktor 0,001)
-												Mult = 10f;
-											};
-											
-											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Liter") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Milliliter")) {
-												// Umrechnung: Artikelmenge in Liter --> Preisberechnung in â‚¬/100 Milliliter (Faktor 0,001)
-												Mult = 10f;
-											};
-											
-											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Liter")) {
-												// Umrechnung: Artikelmenge in Milliliter --> Preisberechnung in â‚¬/100 Milliliter (Faktor 0,001)
-												Mult = 0.001f;
-											};
-											bestandsListeModel.setValueAt(String.valueOf((Float.parseFloat((String) bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) - Float.parseFloat(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
-											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
-											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText())), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText()) * Mult * (Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
-											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
-											
-											insertValue.setVisible(false);
-											addValueButton.setVisible(false);
-											mengeHinweisArea.setVisible(false);
-										}
-										bestandsListe.clearSelection();
+									if (Float.parseFloat(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) >= Float.parseFloat(insertValue.getText()) && Float.parseFloat(insertValue.getText()) > 0 ) 
+									{
+										bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) - Float.parseFloat(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
+										Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
+										einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
+										einkaufsListeModel.setValueAt(String.valueOf(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+										einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+										changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
 									}
+									bestandsListe.clearSelection();
 								}
+								
 							});			
 						}
 					}
@@ -320,9 +330,9 @@ public class GUIEinkauf extends JFrame
 		);
 		
 		/**
-		 * Dieser MouseListener lÃ¶scht den Inhalt des Eingabefeldes "insertValue", sobald dieses mit der Maus angeklickt wird. 
-		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "addValueButton" zu erhÃ¶hen. 
-		 * Beachte: Dieses wird nur angezeigt, wenn ein Produkt zur Einkaufsliste hinzugefÃ¼gt werden soll, dessen Einheit nicht in "StÃ¼ck" angegeben ist. (siehe auch "addButton"-Funktion)
+		 * Dieser MouseListener löscht den Inhalt des Eingabefeldes "insertValue", sobald dieses mit der Maus angeklickt wird. 
+		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "addValueButton" zu erhöhen. 
+		 * Beachte: Dieses wird nur angezeigt, wenn ein Produkt zur Einkaufsliste hinzugefügt werden soll, dessen Einheit nicht in "Stück" angegeben ist. (siehe auch "addButton"-Funktion)
 		 * 
 		 */
 		insertValue.addMouseListener(new MouseAdapter() 
@@ -335,8 +345,8 @@ public class GUIEinkauf extends JFrame
 		});
 		
 		/**
-		 *  Dieser MouseListener lÃ¶scht den Inhalt des Eingabefeldes "searchField", sobald dieses mit der Maus angeklickt wird. 
-		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "searchButton" zu erhÃ¶hen. 
+		 *  Dieser MouseListener löscht den Inhalt des Eingabefeldes "searchField", sobald dieses mit der Maus angeklickt wird. 
+		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "searchButton" zu erhöhen. 
 		 *  
 		 */
 		searchField.addMouseListener(new MouseAdapter() 
@@ -349,9 +359,9 @@ public class GUIEinkauf extends JFrame
 		});
 		
 		/**
-		 *  Dieser MouseListener lÃ¶scht den Inhalt des Eingabefeldes "BarGeldField", sobald dieses mit der Maus angeklickt wird. 
-		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "WechelgeldBerechnenButton" zu erhÃ¶hen. 
-		 * Beachte: Dieses Feld mit dem dazugehÃ¶rigen Button wird erst nach dem AbschlieÃŸen des Einkaufs sichtbar.
+		 *  Dieser MouseListener löscht den Inhalt des Eingabefeldes "BarGeldField", sobald dieses mit der Maus angeklickt wird. 
+		 * Dies dient vorallem dazu die Bedienerfreundlichkeit der Funktion unter dem "WechelgeldBerechnenButton" zu erhöhen. 
+		 * Beachte: Dieses Feld mit dem dazugehörigen Button wird erst nach dem Abschließen des Einkaufs sichtbar.
 		 *  
 		 */
 		BarGeldField.addMouseListener(new MouseAdapter() 
@@ -364,9 +374,9 @@ public class GUIEinkauf extends JFrame
 		});
 		
 		/**
-		 * Dieser Actionlistener lÃ¶scht einzelne Elemente aus der Einkaufsliste. Es wird immer das Element gelÃ¶scht das vom Nutzer ausgewÃ¤hlt wurde.
+		 * Dieser Actionlistener löscht einzelne Elemente aus der Einkaufsliste. Es wird immer das Element gelöscht das vom Nutzer ausgewählt wurde.
 		 * Dieser geht die gesamte Bestandsliste durch, bis das, im Bestand, zu reduzierende Produkt gefunden worden ist, dieses wird dann um den entsprechenden Betrag verringert.
-		 * 		Pro StÃ¼ck jeweils um den Wert 1, bei nicht-StÃ¼ck Mengen um den jeweiligen Betrag, um den das Produkt vorher hinzugefÃ¼gt wurde.
+		 * 		Pro Stück jeweils um den Wert 1, bei nicht-Stück Mengen um den jeweiligen Betrag, um den das Produkt vorher hinzugefügt wurde.
 		 */
 		removeButton.addActionListener(new ActionListener() 
 		{
@@ -390,10 +400,11 @@ public class GUIEinkauf extends JFrame
 				einkaufsListeModel.removeRow(getRow(einkaufsListe));
 				}
 			});
+		
 		/**
-		 * Funktioniert im Kern wie die FunktionalitÃ¤t des "removeButtons". Es wird zusÃ¤tzlich fÃ¼r jedes Element Ã¼ber die gesamte Einkaufsliste itteriert, um jedes Element zu entfernen.
-		 * Jedoch werden nur die Artikel auf der Einkaufsliste wieder der Bestandsliste hinzugefÃ¼gt.
-		 * Zur Vereinfachung wird die Zwischensumme am Ende auf "Zwischensumme: 0â‚¬" gesetzt und die Einkaufsliste komplett gelÃ¶scht.
+		 * Funktioniert im Kern wie die Funktionalität des "removeButtons". Es wird zusätzlich für jedes Element über die gesamte Einkaufsliste iteriert, um jedes Element zu entfernen.
+		 * Jedoch werden nur die Artikel auf der Einkaufsliste wieder der Bestandsliste hinzugefügt.
+		 * Zur Vereinfachung wird die Zwischensumme am Ende auf "Zwischensumme: 0€" gesetzt und die Einkaufsliste komplett gelöscht.
 		 */
 		removeAllButton.addActionListener(new ActionListener()
 		{
@@ -415,30 +426,39 @@ public class GUIEinkauf extends JFrame
 				}
 				einkaufsListeModel.getDataVector().removeAllElements();
 				einkaufsListe.repaint();
-				zwischensumme.setText("Zwischensumme: 0â‚¬");
+				zwischensumme.setText("Zwischensumme: 0€");
 					zValue = 0f;
 					}
 				});	
-		/**
-		 * Hiermit wird der Einkauf abgeschlossen. Die nun Ã¼brige Bestandsliste wird als neuer Bestand behandelt. Aus diesem Grund wird die xml Datei, aus der anfÃ¤nglich die Bestandsliste ausgelesen wurde mit der Ã¼berarbeiteten Bestandsliste Ã¼berschrieben.
-		 */
 		
+		
+		/**
+		 * Hiermit wird der Einkauf abgeschlossen. Mit dem veränderten Bestand (effektiv die Einkausliste) wird die xml auf den aktuellen Stand gebracht. 
+		 * Also alle Artikel die auf der Einkaufsliste sind, werden nach und nach von der xml Datei in Menge oder Stückzahl (kommt auf den Artikel an) reduziert.
+		 * 
+		 * Anschließend wird die Einkaufsliste gelöscht.
+		 */	
 		einkaufEndgueltigAbschliessenButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
 				interactionsPanelAbschluss.setVisible(false);
-				interactionsPanel.setVisible(true);	
-				
-				
-				//Die Funktion, um dann die Bestandsliste wieder zurÃ¼ckzufÃ¼hren.
+				interactionsPanel.setVisible(true);
+				saveBestand(einkaufsListeModel);
+				DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);				
+				DatenSchreiber.Schreiben();
 			
-			//removeAll kopieren.
+				einkaufsListeModel.getDataVector().removeAllElements();
+				einkaufsListe.repaint();
 			}
 		}
 		);
 		
-
+		/**
+		 * Mit diesem Button gelangt Nutzer zur Abschlussansicht des Einkaufs.
+		 * Dort wird dem die Endsumme und das zu gebende Wechselgeld angezeigt, wenn der Nutzer erhaltenes Bargeld angibt.
+		 * 
+		 */
 		einkaufAbschliessenButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -446,11 +466,15 @@ public class GUIEinkauf extends JFrame
 				interactionsPanel.setVisible(false);	
 				add(interactionsPanelAbschluss, BorderLayout.CENTER);
 				interactionsPanelAbschluss.setVisible(true);
-				AbschlussArea.setText("Endsumme: " + zValue + "\n Wechselgeld: 0â‚¬");
+				AbschlussArea.setText("Endsumme: " + zValue + "\n Wechselgeld: 0€");
 			}
 		}
 		);
-		
+		/**
+		 * Berechnet nach dem Betätigen des Buttons das Wechselgeld. Wechselgeld wird gemeinsam mit der Endsumme ausgegeben.
+		 * 
+		 * Beachte: Dies ist für den Nutzer erst sichtbar, wenn dieser im Einkaufsabschluss ist.
+		 */
 		WechelgeldBerechnenButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
@@ -458,7 +482,7 @@ public class GUIEinkauf extends JFrame
 				try {
 					float moneyInput = Float.parseFloat(BarGeldField.getText());
 					ErrorArea.setText("");
-					AbschlussArea.setText("Endsumme: " + zValue + "\n Wechselgeld: " + (Float.parseFloat(BarGeldField.getText()) - zValue) + " â‚¬");
+					AbschlussArea.setText("Endsumme: " + zValue + "\n Wechselgeld: " + (Float.parseFloat(BarGeldField.getText()) - zValue) + " €");
 				}
 				catch (NumberFormatException e1)
 				{
@@ -470,7 +494,7 @@ public class GUIEinkauf extends JFrame
 		);
 		
 		/**
-		 * Durch Ã„nderungen im Suchfeld "searchField" wird die Suche durchgefÃ¼hrt.
+		 * Durch Änderungen, jeglicher Art, im Suchfeld "searchField" wird die Suche durchgeführt.
 		 * Mittels eines RowFilters wird die Liste nach der Eingabe im "searchField" gefiltert. D.h., alle Artikel werden angezeigt, die den Suchtext enthalten. Ist keine Suche eingegeben, wird alles ungefiltert ausgegeben.
 		 */
 		searchField.getDocument().addDocumentListener(new DocumentListener()
@@ -503,8 +527,15 @@ public class GUIEinkauf extends JFrame
  		          }
  		  	}
         });	
+	
+	/*switchScreens.addActionListener(new ActionListener() {
+
+        public void actionPerformed(ActionEvent arg0) {
+        	Main.switchToAdmin();
+        }
+ 
+   });*/
 	}
-		
 	//(\w+)\.getSelectedRow\(\)
 	// getRow\($1\)
 	
