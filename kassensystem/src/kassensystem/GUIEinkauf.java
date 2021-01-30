@@ -22,11 +22,13 @@ import javax.swing.JTable;
 
 public class GUIEinkauf extends JFrame
 	{
+	//alle graphischen Elemente deklarieren:
 	private JPanel interactionsPanel;
 	private JPanel interactionsPanelAbschluss;
 	private JPanel einkaufsListePanel;
 	private JPanel bestandsListePanel;
 	private JTextArea hinweisArea;
+	private JTextArea mengeHinweisArea;
 	private JTextArea AbschlussArea;
 	private JTextArea ErrorArea;
 	private JLabel zwischensumme;
@@ -44,7 +46,7 @@ public class GUIEinkauf extends JFrame
 	private JTextField BarGeldField;
 	private float zValue = 0f;
 
-	
+	//Bildschirmauflösung des Nutzers ermitteln, um das Fenster und die Elemente dynamisch anpassen
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	double screenWidth = screenSize.getWidth();
 	double screenHeight = screenSize.getHeight();
@@ -91,6 +93,8 @@ public class GUIEinkauf extends JFrame
 
 	private GUIEinkauf() 
 	{
+		
+		//Initialisierung aller graphischen Elemente
 		setLayout(new BorderLayout());
 		JPanel einkaufsListePanel = new JPanel();
 		JPanel interactionsPanel = new JPanel();
@@ -99,7 +103,8 @@ public class GUIEinkauf extends JFrame
 		addButton = new JButton("Hinzufügen");
 		removeButton = new JButton("Ausgewähltes Element entfernen");
 		removeAllButton = new JButton("Alles entfernen");
-		insertValue = new JTextField("Hier Wert eingeben");
+		insertValue = new JTextField("Hier Wert eingeben. ");
+		mengeHinweisArea = new JTextArea("Beachte! \nDie Menge muss in der Einheit angegeben werden, wie diese auch ein der Bestandsliste in der Spalte Menge angegeben ist. \nKommata bitte als Punkt angeben. (z.B. 2.3)");
 		addValueButton = new JButton("Menge eingeben");
 		zwischensumme = new JLabel("Zwischensumme: "+ zValue +" €");
 		searchField = new JTextField("Suchwort: ");
@@ -139,7 +144,7 @@ public class GUIEinkauf extends JFrame
 			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
 			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
 			{"Rinderfilet", "6787383","n","n", "2498.33", "€/Kilogramm" , "20000" , "Gramm","Fleisch"},
-			{"Rinderwurst", "2327383","n","n", "298.13", "€/Kilogramm" , "200" , "Kilogramm","Fleisch"},
+			{"Rinderwurst", "2327383","n","n", "298.13", "€/100 Gramm" , "200" , "Kilogramm","Fleisch"},
 		};
 	
 		
@@ -178,6 +183,9 @@ public class GUIEinkauf extends JFrame
 		interactionsPanel.add(removeButton);
 		interactionsPanel.add(removeAllButton);
 		interactionsPanel.add(insertValue);
+		interactionsPanel.add(mengeHinweisArea);
+		mengeHinweisArea.setBackground(interactionsPanel.getBackground());
+		mengeHinweisArea.setForeground(Color.red);
 		interactionsPanel.add(addValueButton);
 		interactionsPanel.add(searchField);
 		interactionsPanel.add(hinweisArea);
@@ -187,6 +195,7 @@ public class GUIEinkauf extends JFrame
 		hinweisArea.setBackground(interactionsPanel.getBackground());
 		insertValue.setVisible(false);
 		addValueButton.setVisible(false);
+		mengeHinweisArea.setVisible(false);
 		
 		
 		this.getContentPane().add(bestandsListePanel, BorderLayout.EAST);
@@ -231,9 +240,9 @@ public class GUIEinkauf extends JFrame
 				insertValue.setVisible(false);
 				addValueButton.setVisible(false);	
 				if (bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl) != "n") {
-						if (Integer.parseInt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) > 0)
+						if (Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) > 0)
 						{
-						bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) - 1), getRow(bestandsListe), StkZahl);
+						bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), StkZahl)) - 1), getRow(bestandsListe), StkZahl);
 						Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
 						einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
 						einkaufsListeModel.setValueAt("1", einkaufsListeModel.getRowCount() - 1, StkZahl);
@@ -243,19 +252,20 @@ public class GUIEinkauf extends JFrame
 				
 					else
 						{
-						if (Integer.parseInt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) > 0) {
+						if (Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) > 0) {
 							insertValue.setVisible(true);
 							addValueButton.setVisible(true);
+							mengeHinweisArea.setVisible(true);
 							addValueButton.addActionListener(new ActionListener () 
 							{
 								public void actionPerformed(ActionEvent e) {
-									if (Integer.parseInt(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) >= Integer.parseInt(insertValue.getText()) && Integer.parseInt(insertValue.getText()) > 0 ) {
+									if (Float.parseFloat(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) >= Float.parseFloat(insertValue.getText()) && Float.parseFloat(insertValue.getText()) > 0 ) {
 										if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).equals(((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).substring(2,((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).length()))) {
-											bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) - Integer.parseInt(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
+											bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte)) - Float.parseFloat(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
 											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
 											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
 											einkaufsListeModel.setValueAt(String.valueOf(insertValue.getText()), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText()) * Float.parseFloat(((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount() - 1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
 											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
 										}
 										else {
@@ -282,21 +292,24 @@ public class GUIEinkauf extends JFrame
 											};
 											
 											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Liter") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Milliliter")) {
+												// Umrechnung: Artikelmenge in Liter --> Preisberechnung in €/100 Milliliter (Faktor 0,001)
 												Mult = 10f;
 											};
 											
 											if (((String)bestandsListeModel.getValueAt(getRow(bestandsListe), MengeEinheitSpalte)).contains("Milliliter") & ((String)bestandsListeModel.getValueAt(getRow(bestandsListe), GPreisEinheitSpalte)).contains("Liter")) {
+												// Umrechnung: Artikelmenge in Milliliter --> Preisberechnung in €/100 Milliliter (Faktor 0,001)
 												Mult = 0.001f;
 											};
-											bestandsListeModel.setValueAt(String.valueOf((Integer.parseInt((String) bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) - Integer.parseInt(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
+											bestandsListeModel.setValueAt(String.valueOf((Float.parseFloat((String) bestandsListeModel.getValueAt(getRow(bestandsListe), MengeSpalte))) - Float.parseFloat(insertValue.getText())), getRow(bestandsListe), MengeSpalte);
 											Vector neuerArtikelAufEinkaufsListe = new  Vector(bestandsListeModel.getDataVector().elementAt(getRow(bestandsListe)));
 											einkaufsListeModel.addRow(neuerArtikelAufEinkaufsListe);
-											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText())), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
-											einkaufsListeModel.setValueAt(String.valueOf(Integer.parseInt(insertValue.getText()) * Mult * (Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
+											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText())), einkaufsListeModel.getRowCount() - 1, MengeSpalte);
+											einkaufsListeModel.setValueAt(String.valueOf(Float.parseFloat(insertValue.getText()) * Mult * (Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, GrundPreis)))), einkaufsListeModel.getRowCount() - 1, EndpreisSpalte);
 											changeZwischensumme(Float.parseFloat((String)einkaufsListeModel.getValueAt(einkaufsListeModel.getRowCount()-1, EndpreisSpalte)));
 											
 											insertValue.setVisible(false);
 											addValueButton.setVisible(false);
+											mengeHinweisArea.setVisible(false);
 										}
 										bestandsListe.clearSelection();
 									}
@@ -357,9 +370,6 @@ public class GUIEinkauf extends JFrame
 		 * Dieser geht die gesamte Bestandsliste durch, bis das, im Bestand, zu reduzierende Produkt gefunden worden ist, dieses wird dann um den entsprechenden Betrag verringert.
 		 * 		Pro Stück jeweils um den Wert 1, bei nicht-Stück Mengen um den jeweiligen Betrag, um den das Produkt vorher hinzugefügt wurde.
 		 */
-		
-		
-		// removes brauchen noch liebe :)
 		removeButton.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) {
@@ -372,10 +382,10 @@ public class GUIEinkauf extends JFrame
 		
 				}
 				if ((String)bestandsListeModel.getValueAt(i, StkPreis) != "n") {
-					bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) bestandsListeModel.getValueAt(i,StkZahl)) + 1), i, StkZahl);
+					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) bestandsListeModel.getValueAt(i,StkZahl)) + 1), i, StkZahl);
 					}	
 					else {
-						bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) einkaufsListeModel.getValueAt(getRow(einkaufsListe),MengeSpalte)) + Integer.parseInt((String) bestandsListeModel.getValueAt(i,MengeSpalte))), i, MengeSpalte);
+						bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) einkaufsListeModel.getValueAt(getRow(einkaufsListe),MengeSpalte)) + Float.parseFloat((String) bestandsListeModel.getValueAt(i,MengeSpalte))), i, MengeSpalte);
 					}
 				
 				changeZwischensumme(Float.parseFloat((String)(einkaufsListeModel.getValueAt(getRow(einkaufsListe), EndpreisSpalte))) - 2* Float.parseFloat((String)(einkaufsListeModel.getValueAt(getRow(einkaufsListe), EndpreisSpalte))));
@@ -399,10 +409,10 @@ public class GUIEinkauf extends JFrame
 						j++;
 					}
 					if (einkaufsListeModel.getValueAt(i, StkPreis) != "n") {
-					bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) bestandsListeModel.getValueAt(j,StkZahl)) + 1), j, StkZahl);
+					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) bestandsListeModel.getValueAt(j,StkZahl)) + 1), j, StkZahl);
 					}	
 					else {
-					bestandsListeModel.setValueAt(String.valueOf(Integer.parseInt((String) einkaufsListeModel.getValueAt(i,MengeSpalte)) + Integer.parseInt((String) bestandsListeModel.getValueAt(j,MengeSpalte))), j, MengeSpalte);
+					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) einkaufsListeModel.getValueAt(i,MengeSpalte)) + Float.parseFloat((String) bestandsListeModel.getValueAt(j,MengeSpalte))), j, MengeSpalte);
 					}
 				}
 				einkaufsListeModel.getDataVector().removeAllElements();
@@ -503,7 +513,8 @@ public class GUIEinkauf extends JFrame
 	public static void main(String[] args) 
 	{
 		java.awt.EventQueue.invokeLater(new Runnable() {
-		public void run() {
+			public void run() 
+			{
 			GUIEinkauf gui = new GUIEinkauf();
 			gui.setTitle("Einkaufsansicht");
 			gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
