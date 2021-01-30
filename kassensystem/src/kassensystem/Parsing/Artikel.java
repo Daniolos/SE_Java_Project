@@ -15,7 +15,7 @@ public class Artikel {
 	private String preis;
 	private String anzahl;
 	private String grundpreis;
-	private String preiseinheit; 
+	private String peinheit; 
 	private String gewicht;
 	private String[] einheiten = { "kg", "g", "l", "ml", "p" };
 	private String einheit;
@@ -23,15 +23,15 @@ public class Artikel {
 
 /**
  * 
- * @param	String	Grundpreiseinheit des Artikels
- * @return	Boolean	Ist der übergebene String eine zulässige Grundpreiseinheit?
+ * @param	String	Grundpeinheit des Artikels
+ * @return	Boolean	Ist der übergebene String eine zulässige Grundpeinheit?
  */
-	public boolean checkPreiseinheit(String preiseinheit) {
+	public boolean checkpeinheit(String peinheit) {
 		try {
 			
-			if (preiseinheit.equals("n")) { return true; }
+			if (peinheit.equals("n")) { return true; }
 			for (String s : einheiten) {
-				if (preiseinheit.contains(s)) {
+				if (peinheit.contains(s)) {
 					return true;
 				}
 			}
@@ -39,7 +39,7 @@ public class Artikel {
 			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			System.err.println("Ungültige Eingabe bei Preiseinheit.");
+			System.err.println("Ungültige Eingabe bei peinheit.");
 			return false;
 		}
 	}
@@ -88,14 +88,24 @@ public class Artikel {
 	 */
 	public boolean checkAnzahl(String anzahl) {
 
-		if (!anzahl.matches("[0-9]+")) {
+		try
+		{
+		if (!anzahl.matches("[0-9]*(,|.)?[0-9]+")) {
 			if (anzahl.equals("n")) {
 				return true;
 			}
 			return false;
+		
 		}
-
-		return (1 <= Integer.parseInt(anzahl) && Integer.parseInt(anzahl) <= 1000);
+		
+		Boolean check = (1 <= Float.parseFloat(anzahl) && Float.parseFloat(anzahl) <= 1000);
+		return check;
+		}
+		catch (NumberFormatException e)
+		{
+			e.printStackTrace();
+			return true;
+		}		
 	}
 
 	/**
@@ -166,18 +176,18 @@ public class Artikel {
 	 * @param	String	EAN oder PLU
 	 * @param	String	Kategorie
 	 * @param	String	Einheit
-	 * @param	String	Grundpreiseinheit
+	 * @param	String	Grundpeinheit
 	 * @param	String	Gewicht
 	 * @param	String	Anzahl (Wie oft ist der Artikel im Lager?)
 	 * @param	String	Preis
 	 * @param	String	Grundpreis
 	 */
-	public Artikel(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht, String anzahl,
+	public Artikel(String name, String ean, String kategorie, String einheit, String peinheit, String gewicht, String anzahl,
 			String preis, String grundpreis) {
 		setName(name);
 		setKategorie(kategorie);
 		setEan(ean);
-		setPreiseinheit(preiseinheit);
+		setpeinheit(peinheit);
 		setGewicht(gewicht);
 		setAnzahl(anzahl);
 		setPreis(preis);
@@ -195,7 +205,7 @@ public class Artikel {
 		setNameFromXML();
 		setKategorieFromXML();
 		setEanFromXML();
-		setPreiseinheitFromXML();
+		setpeinheitFromXML();
 		setGewichtFromXML();
 		setAnzahlFromXML();
 		setPreisFromXML();
@@ -208,18 +218,18 @@ public class Artikel {
 	 * @param	String	EAN oder PLU
 	 * @param	String	Kategorie
 	 * @param	String	Einheit
-	 * @param	String	Grundpreiseinheit
+	 * @param	String	Grundpeinheit
 	 * @param	String	Gewicht
 	 * @param	String	Anzahl (Wie oft ist der Artikel im Lager?)
 	 * @param	String	Preis
 	 * @param	String	Grundpreis
 	 */
-	public void update(String name, String ean, String kategorie, String einheit, String preiseinheit, String gewicht,
+	public void update(String name, String ean, String kategorie, String einheit, String peinheit, String gewicht,
 			String anzahl, String preis, String grundpreis) {
 		setName(name);
 		setKategorie(kategorie);
 		setEan(ean);
-		setPreiseinheit(preiseinheit);
+		setpeinheit(peinheit);
 		setAnzahl(anzahl);
 		setGewicht(gewicht);
 		setEinheit(einheit);
@@ -235,7 +245,7 @@ public class Artikel {
 	 * 						3. Stückpreis
 	 * 						4. Anzahl (Wie oft ist der Artikel im Lager?)
 	 * 						5. Grundpreis
-	 * 						6. Grundpreiseinheit (€/kg, €/100g,...)
+	 * 						6. Grundpeinheit (€/kg, €/100g,...)
 	 * 						7. Gewicht
 	 * 						8. Einheit (kg, g, l, ml, p)
 	 * 						9. Kategorie
@@ -247,7 +257,7 @@ public class Artikel {
 		arr[2] = this.getPreis();
 		arr[3] = this.getAnzahl();
 		arr[4] = this.getGrundpreis();
-		arr[5] = this.getPreiseinheit();
+		arr[5] = this.getpeinheit();
 		arr[6] = this.getGewicht();
 		arr[7] = this.getEinheit();
 		arr[8] = this.getKategorie();		
@@ -261,11 +271,11 @@ public class Artikel {
 	 */
 
 	/**
-	 * Getter-Methode für die Grundpreiseinheit
-	 * @return	String	Grundpreiseinheit
+	 * Getter-Methode für die Grundpeinheit
+	 * @return	String	Grundpeinheit
 	 */
-	public String getPreiseinheit() {
-		return preiseinheit;
+	public String getpeinheit() {
+		return peinheit;
 	}
 	
 	/**
@@ -339,14 +349,14 @@ public class Artikel {
 	 */
 
 	/**
-	 * Setter-Methode für die Grundpreiseinheit dieses Artikels. 
-	 * Überprüft vor der Zuweisung, ob die übergebene Grundpreiseinheit
+	 * Setter-Methode für die Grundpeinheit dieses Artikels. 
+	 * Überprüft vor der Zuweisung, ob die übergebene Grundpeinheit
 	 * zulässig ist. Ist sie das nicht, wird diesem Artikel ein leerer String
-	 * als Grundpreiseinheit zugewiesen, sonst der übergebene.
-	 * @param	String	Grundpreiseinheit
+	 * als Grundpeinheit zugewiesen, sonst der übergebene.
+	 * @param	String	Grundpeinheit
 	 */
-	public void setPreiseinheit(String preiseinheit) {
-		this.preiseinheit = checkPreiseinheit(preiseinheit) ? preiseinheit : "";
+	public void setpeinheit(String peinheit) {
+		this.peinheit = checkpeinheit(peinheit) ? peinheit : "";
 	}
 	
 	/**
@@ -462,10 +472,10 @@ public class Artikel {
 	}
 
 	/**
-	 * Weist diesem Artikel seine in der XML-Datei gespeicherte Grundpreiseinheit zu.
+	 * Weist diesem Artikel seine in der XML-Datei gespeicherte Grundpeinheit zu.
 	 */
-	private void setPreiseinheitFromXML() {
-		preiseinheit = xmlParser.getChild("preiseinheit");
+	private void setpeinheitFromXML() {
+		peinheit = xmlParser.getChild("peinheit");
 	}
 
 	/**
@@ -505,7 +515,7 @@ public class Artikel {
 	}
 
 	public void print() {
-		System.out.println(name + ", " + ean + ", " + kategorie + ", " + einheit + ", " + preiseinheit + ", " + gewicht + ", "
+		System.out.println(name + ", " + ean + ", " + kategorie + ", " + einheit + ", " + peinheit + ", " + gewicht + ", "
 				+ anzahl + ", " + preis + ", " + grundpreis);
 	}
 }
