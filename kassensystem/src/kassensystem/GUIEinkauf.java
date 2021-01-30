@@ -1,6 +1,5 @@
-package kassensystem;
-
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Vector;
 import java.awt.event.*;
 import java.awt.event.ItemListener;
@@ -9,6 +8,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.table.*;
+
+import Database.DatenLeser;
+import Database.DatenSchreiber;
+import Database.Lager;
+import Parsing.Artikel;
+import Parsing.XMLParser;
+
 import javax.swing.event.*;
 import java.awt.Color;
 import java.lang.Math.*;
@@ -45,6 +51,7 @@ public class GUIEinkauf extends JFrame
 	private JTextField searchField;
 	private JTextField BarGeldField;
 	private float zValue = 0f;
+	private Lager lager;
 
 	int NameSpalte = 0;
 	int EANSpalte = 1;
@@ -85,22 +92,36 @@ public class GUIEinkauf extends JFrame
 	/**
 	 * 
 	 */
-	/*private void fillTable() {
-		DatenLeser bla = new DatenLeser();
-        XMLParser xml = new XMLParser(bla.getData());
-        String article = xml.getChild("articles");
-		Lager lager = new Lager(xml.getXML());
-		String[][] Array = lager.toStringArray();
-		for (int i = 0; i < Array.length; i++)
-		{
-			bestandsListeModel.addRow(Array[i]);
-		}
-	}*/
+	
+	
+	
 
-	/*private saveBestand() 
-	 * {
-	 * }
-	 */
+	private void saveBestand(DefaultTableModel daten) 
+	 {
+		for (int i = 0; i < daten.getRowCount(); i++)
+		{
+			Artikel article = lager.search((String)daten.getValueAt(i, EANSpalte));
+			
+			
+			try 
+			{
+			if (!article.getAnzahl().equals("n"))
+			{
+				float merke = Float.parseFloat(article.getAnzahl());
+				article.setAnzahl(String.valueOf(merke -Float.parseFloat((String)daten.getValueAt(i, StkZahl))));
+				continue;
+			}
+			
+			float merke = Float.parseFloat(article.getGewicht());
+			article.setGewicht(String.valueOf(merke -Float.parseFloat((String)daten.getValueAt(i, MengeSpalte))));
+			continue;
+			}
+			catch (NumberFormatException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	 }
 
 	private GUIEinkauf() 
 	{
@@ -142,11 +163,11 @@ public class GUIEinkauf extends JFrame
 		
 		Object[][] dataBestand = 
 		{											
-			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
-			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
-			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
-			{"Rinderfilet", "6787383","n","n", "2498.33", "€/Kilogramm" , "20000" , "Gramm","Fleisch"},
-			{"Rinderwurst", "2327383","n","n", "298.13", "€/100 Gramm" , "200" , "Kilogramm","Fleisch"},
+//			{"Apfel", "0192992", "19.92", "200","n","n","n", "Stück","Obst"},
+//			{"Tomate", "3432342", "2.34", "3","n","n","n", "Stück","Gemüse"},
+//			{"Brot", "2345323","213.32", "7","n","n","n", "Stück","Backwaren"},
+//			{"Rinderfilet", "6787383","n","n", "2498.33", "€/Kilogramm" , "20000" , "Gramm","Fleisch"},
+//			{"Rinderwurst", "2327383","n","n", "298.13", "€/100 Gramm" , "200" , "Kilogramm","Fleisch"},
 		};
 	
 		
@@ -208,7 +229,20 @@ public class GUIEinkauf extends JFrame
 		bestandsListe.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(bestandsListe);
 		bestandsListePanel.add(scrollPane);
-	
+		
+		DatenLeser bla = new DatenLeser();
+	    XMLParser xml = new XMLParser(bla.getData());
+	    System.out.println(xml.getXML());
+//	    String article = xml.getChild("articles");
+		lager = new Lager(xml.getXML());
+		String[][] Array = lager.toStringArray();
+		for (int i = 0; i < Array.length; i++)
+		{
+			bestandsListeModel.addRow(Array[i]);
+			System.out.println(Array[i]);
+		}
+		System.out.println(Arrays.deepToString(Array));
+		
 	
 		// Zum späteren späteren Filtern
 		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
@@ -428,8 +462,10 @@ public class GUIEinkauf extends JFrame
 			public void actionPerformed(ActionEvent e) 
 			{
 				interactionsPanelAbschluss.setVisible(false);
-				interactionsPanel.setVisible(true);	
-				
+				interactionsPanel.setVisible(true);
+				saveBestand(einkaufsListeModel);
+				DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);				
+				DatenSchreiber.Schreiben();
 				
 				//Die Funktion, um dann die Bestandsliste wieder zurückzuführen.
 			
