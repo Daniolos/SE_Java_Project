@@ -22,6 +22,11 @@ import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import Database.DatenLeser;
+import Database.DatenSchreiber;
+import Database.Lager;
+import Parsing.XMLParser;
+
 
 public class Filialleitung extends JFrame implements ActionListener {
 	// hier werden alle benötigten Klassen deklariert
@@ -68,6 +73,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	private JButton submitButton;
 	private JButton clearButton;
 	private JButton submitModificationsButton;
+	private Lager lager;
 	
 	
 	
@@ -88,6 +94,12 @@ public class Filialleitung extends JFrame implements ActionListener {
 	
 	
 	public Filialleitung() {
+		DatenLeser bla = new DatenLeser();
+	    XMLParser xml = new XMLParser(bla.getData());
+	    System.out.println(xml.getXML());
+//	    String article = xml.getChild("articles");
+		lager = new Lager(xml.getXML());
+		
 		setGrundPreisEinheiten();
 		setMengenEinheiten();
 		setCategories();
@@ -300,7 +312,14 @@ public class Filialleitung extends JFrame implements ActionListener {
 	     			};
 	        	 
 	        	 //hier überprüfen ob die eingegebenen Eigenschaften in ordnung sind
-
+ 
+	        	 int check = lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
+	        	 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
+	        	 
+	        	 DatenSchreiber.Schreiben();
+	        	 
+	        	 
+	        	 
 	        	 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
 	        	 dataBestand[dataBestand.length-1] = completeArticle;
 	     		
@@ -399,25 +418,29 @@ public class Filialleitung extends JFrame implements ActionListener {
 	
 	private void setGrundPreisEinheiten() {
 		//import Array from DataBase
-		String[] unitsFromDB = { "€/kg", "€/l", "n"};
+		String[] unitsFromDB = { "€/kg", "€/100g", "€/l", "€/100ml", "n"};
 		grundPreisEinheiten = Arrays.copyOf(unitsFromDB, unitsFromDB.length);
 		
 	}
 	
 	private void setMengenEinheiten() {
 		//import Array from DataBase
-		String[] unitsFromDB = { "kg", "l", "n"};
+		String[] unitsFromDB = { "kg", "g", "l", "ml", "n"};
 		mengenEinheiten = Arrays.copyOf(unitsFromDB, unitsFromDB.length);
 	}
 	
 	private void setCategories() {
 		//import 
+		String[] categoriesFromDB = lager.getKategorien().toStringArray();
+		categories = Arrays.copyOf(categoriesFromDB, categoriesFromDB.length);
+		System.out.println(Arrays.toString(categoriesFromDB));
+		System.out.println(Arrays.toString(categories));
 	}
 
 	private void setDataBestand() {
 		//import Array from Database
-		
-		
+		String[][] dataFromDB = lager.toStringArray();
+		dataBestand = Arrays.copyOf(dataFromDB, dataFromDB.length);
 	}
 
 	public static void main(String[] args) 
