@@ -22,6 +22,7 @@ import javax.swing.JTable;
 
 public class GUIEinkauf extends JFrame
 	{
+	//alle graphischen Elemente deklarieren:
 	private JPanel interactionsPanel;
 	private JPanel interactionsPanelAbschluss;
 	private JPanel einkaufsListePanel;
@@ -45,7 +46,18 @@ public class GUIEinkauf extends JFrame
 	private JTextField BarGeldField;
 	private float zValue = 0f;
 
+	int NameSpalte = 0;
+	int EANSpalte = 1;
+	int StkPreis = 2;
+	int StkZahl = 3;
+	int GrundPreis= 4;
+	int GPreisEinheitSpalte= 5;
+	int MengeSpalte= 6;
+	int MengeEinheitSpalte = 7;
+	int KategorieSpalte = 8;
+	int EndpreisSpalte = 9; 	
 	
+	//Bildschirmauflösung des Nutzers ermitteln um das Fenster und die Elemente dynamisch anpassen
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	double screenWidth = screenSize.getWidth();
 	double screenHeight = screenSize.getHeight();
@@ -92,6 +104,8 @@ public class GUIEinkauf extends JFrame
 
 	private GUIEinkauf() 
 	{
+		
+		//Initialisierung aller graphischen Elemente
 		setLayout(new BorderLayout());
 		JPanel einkaufsListePanel = new JPanel();
 		JPanel interactionsPanel = new JPanel();
@@ -123,16 +137,7 @@ public class GUIEinkauf extends JFrame
 		 * Die Endpreisspalte ist immer die letzte Spalte, nur bei einkausListe(-Model) verwendbar!!!!
 		 */
 		
-		int NameSpalte = 0;
-		int EANSpalte = 1;
-		int StkPreis = 2;
-		int StkZahl = 3;
-		int GrundPreis= 4;
-		int GPreisEinheitSpalte= 5;
-		int MengeSpalte= 6;
-		int MengeEinheitSpalte = 7;
-		// 8 wäre "Kategorie", wird hier aber nicht genutzt
-		int EndpreisSpalte = 9; 	
+		
 		
 		
 		Object[][] dataBestand = 
@@ -214,8 +219,10 @@ public class GUIEinkauf extends JFrame
 		einkaufsListe.getColumnModel().getColumn(EANSpalte).setMaxWidth(0); //	--> um EAN in der Einkaufsliste zu verbergen
 		einkaufsListe.getColumnModel().getColumn(StkPreis).setMinWidth(0);	
 		einkaufsListe.getColumnModel().getColumn(StkPreis).setMaxWidth(0);
-		einkaufsListe.getColumnModel().getColumn(GPreisEinheitSpalte).setMinWidth(0);	
-		einkaufsListe.getColumnModel().getColumn(GPreisEinheitSpalte).setMaxWidth(0);
+		einkaufsListe.getColumnModel().getColumn(StkZahl).setMinWidth(0);	
+		einkaufsListe.getColumnModel().getColumn(StkZahl).setMaxWidth(0);
+		einkaufsListe.getColumnModel().getColumn(KategorieSpalte).setMinWidth(0);	
+		einkaufsListe.getColumnModel().getColumn(KategorieSpalte).setMaxWidth(0);
 		
 		
 		/**
@@ -268,12 +275,6 @@ public class GUIEinkauf extends JFrame
 										else {
 											
 											float Mult = 10f;
-											
-											
-											
-											// 	>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> nochmal über Umrechnungen schauen <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-											
-											
 											/*
 											 * Hier werden bei den nicht-Stück Mengen die einzelnen Umrechnungen zwischen den Einheiten durchgeführt
 											 * "Mult" dient hierbei als Umrechnungsfaktor
