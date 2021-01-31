@@ -70,22 +70,22 @@ public class Filialleitung extends JFrame implements ActionListener {
 	private JLabel categoryLabel;
 	private DefaultComboBoxModel<String> categoryModel;
 	private JComboBox<String> categoryBox;
-	private JLabel fehlermeldungLabel;
 	private JButton cancelButton;
 	private JButton submitButton;
 	private JButton clearButton;
 	private JButton submitModificationsButton;
-	private Lager lager;
+	private JLabel fehlermeldungLabel;
 	
 	
+	private static Lager lager;
 	
 	// Alle Spaltennamen werden in einem String Array gespeichert
 	String[] columnNames = {"Artikelname", "EAN", "Stückpreis in €", "Stückzahl", "Grundpreis","Grundpreiseinheit", "Menge","Mengeneinheit", "Kategorie"};
 	
-	String[] categories = {};
+	static String[] categories = {};
 	String[] grundPreisEinheiten = {"€/kg", "€/100g", "€/l", "€/100ml", "n"}; 	
 	String[] mengenEinheiten = {"kg", "g", "l", "ml", "n"};
-	String[][] dataBestand = {};
+	static String[][] dataBestand = {};
 	
 	// hier wird die Bidlschirm-Größe mit dem Dimension Object initialisiert
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -141,6 +141,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 clearForm();
 	        	 submitModificationsButton.setVisible(false);
 	        	 formularPanel.setVisible(true);
+	        	 fehlermeldungLabel.setText("");
 	        	 
 	        	 articleAmountLabel.setText("Menge in "+mengenEinheiten[0]);
 	         }
@@ -163,7 +164,7 @@ public class Filialleitung extends JFrame implements ActionListener {
         		 
         		 addButton.setEnabled(true);
         		 removeButton.setEnabled(false);
-	        	 
+        		 fehlermeldungLabel.setText("");
 	        	 submitModificationsButton.setVisible(true);
 	        	 formularPanel.setVisible(true);
 	        	 
@@ -303,6 +304,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 		clearButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent arg0) {
 	        	 clearForm();
+	        	 fehlermeldungLabel.setText("");
 	         }
 	    });
 		
@@ -313,6 +315,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 removeButton.setEnabled(true);
 	        	 clearForm();
 	        	 formularPanel.setVisible(false);
+	        	 fehlermeldungLabel.setText("");
 	         }
 	  
 	    });
@@ -391,6 +394,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	 	        	 
 	 	        	 removeButton.setEnabled(true);
 		        	 addButton.setEnabled(true);
+		        	 fehlermeldungLabel.setText("");
 	        	}
 
 	         }
@@ -487,6 +491,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 		        	 clearForm();
 		        	 formularPanel.setVisible(false);
 		        	 removeButton.setEnabled(true);
+		        	 fehlermeldungLabel.setText("");
 	        	}
 
 	         }
@@ -502,18 +507,18 @@ public class Filialleitung extends JFrame implements ActionListener {
 
 	}
 	
-	public void getData() {
+	public static void getData() {
 		getCategories();
 		getDataBestand();
 	}
 	
-	public void getCategories() {
+	public static void getCategories() {
 		//import 
 		String[] categoriesFromDB = lager.getKategorien().toStringArray();
 		categories = Arrays.copyOf(categoriesFromDB, categoriesFromDB.length);
 	}
 
-	public void getDataBestand() {
+	public static void getDataBestand() {
 		//import Array from Database
 		String[][] dataFromDB = lager.toStringArray();
 		dataBestand = Arrays.copyOf(dataFromDB, dataFromDB.length);
