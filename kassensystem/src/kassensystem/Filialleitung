@@ -27,6 +27,11 @@ import Database.DatenSchreiber;
 import Database.Lager;
 import Parsing.XMLParser;
 
+/**
+ * 
+ * @author Daniel Jürgeleit
+ *
+ */
 
 public class Filialleitung extends JFrame implements ActionListener {
 	// Hier sind alle Interaktionsvariablen
@@ -135,6 +140,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	  
 	    });
 		
+		/**
+		 * Button, um zu einem Formular zu gelangen, in dem man Artikeleigenschaften angeben kann, um mit diesen einen Artikel zu erstellen.
+		 */
+		
 		addButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
@@ -149,6 +158,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         }
 	  
 	    });
+		
+		/**
+		 * Button zum Bearbeiten von Artikeln.
+		 */
 		
 		modifyButton.addActionListener(new ActionListener() {
 
@@ -193,6 +206,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	  
 	    });
 		
+		/**
+		 * Button zum Löschen von Artikeln.
+		 */
+		
 		removeButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
@@ -226,6 +243,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	  
 	    });
 		
+		/**
+		 * Button zum Anlegen von Kategorien.
+		 */
+		
 		createCategoryButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
@@ -247,6 +268,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         }
 	  
 	    });
+		
+		/**
+		 * Button zum Löschen von angelegten Kategorien.
+		 */
 		
 		deleteCategoryButton.addActionListener(new ActionListener() {
 
@@ -273,6 +298,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         }
 	  
 	    });
+		
+		/**
+		 * Button zum Suchen nach Artikeln.
+		 */
 		
 		suchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -306,6 +335,9 @@ public class Filialleitung extends JFrame implements ActionListener {
 		
 		constraintForm();
 		
+		/**
+		 * Button zum leeren des Dokuments zur Bearbeitung von Artikeln.
+		 */
 		
 		clearButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent arg0) {
@@ -313,6 +345,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 fehlermeldungLabel.setText("");
 	         }
 	    });
+		
+		/**
+		 * Button zum Abbrechen.
+		 */
 		
 		cancelButton.addActionListener(new ActionListener() {
 
@@ -325,6 +361,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         }
 	  
 	    });
+		
+		/**
+		 * Button zum Bestätigen des Hinzufügen eines Artikels.
+		 */
 		
 		submitButton.addActionListener(new ActionListener() {
 
@@ -406,6 +446,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         }
 	  
 	    });
+		
+		/**
+		 * Button zum Bestätigen des überarbeiteten Artikels.
+		 */
 		
 		submitModificationsButton.addActionListener(new ActionListener() {
 
@@ -539,20 +583,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 		dataBestand = Arrays.copyOf(dataFromDB, dataFromDB.length);
 	}
 	
-	
-	/**
-	 * die Mainmethode wird nicht ausgeführt und ist nur für Testzwecke vorhanden
-	 * @param args
-	 */
-	public static void main(String[] args) 
-	{
-		Filialleitung admin = new Filialleitung();
-		admin.setTitle("Adminansicht");
-		admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		admin.setExtendedState(JFrame.MAXIMIZED_BOTH);  //Fullscreen
-		admin.setVisible(true);
-	}
-	
 	/**
 	 * Die suche zeigt die, in die Suchzeile eingegebenen, Artikel an
 	 * Es wird nach Artikelnamen und EAN gefiltert
@@ -669,7 +699,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+
 		
 	}
 	
