@@ -98,7 +98,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 	public Filialleitung() {
 		DatenLeser bla = new DatenLeser();
 	    XMLParser xml = new XMLParser(bla.getData());
-	    System.out.println(xml.getXML());
 	    //String article = xml.getChild("articles");
 		lager = new Lager(xml.getXML());
 		
@@ -206,6 +205,8 @@ public class Filialleitung extends JFrame implements ActionListener {
         		 String ean = (String) bestandsListeModel.getValueAt( selectedRow, 1);
         		 
         		 lager.delete(ean);
+        		 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
+        		 DatenSchreiber.Schreiben();
         		 
         		 String[][] copy = new String[dataBestand.length-1][];
         		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
@@ -349,7 +350,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 
 	        	 //hier Überprüfen ob die eingegebenen Eigenschaften in ordnung sind
 	        	 int check = lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
-	        	 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
 	        	 
 	        	 switch(check) {
 	        	  case -1:
@@ -383,6 +383,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        		fehlermeldungLabel.setText("Artikel vorhanden");
 	        	    break;
 	        	  case 0:
+	        		  DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
 	        		  DatenSchreiber.Schreiben();
 	        		  
 	        		 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
@@ -436,7 +437,6 @@ public class Filialleitung extends JFrame implements ActionListener {
         		 }
         		 
         		 int check = lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
-	        	 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
 	        	 
 	        	 switch(check) {
 	        	  case -1:
@@ -471,7 +471,8 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         		lager.delete(oldEan);
 	         		
 	         		lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
-	        		DatenSchreiber.Schreiben();
+	         		DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
+	         		DatenSchreiber.Schreiben();
 	         		
 	         		String[][] copy = new String[dataBestand.length-1][];
 	        		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
