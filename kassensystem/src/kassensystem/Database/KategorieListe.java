@@ -82,6 +82,7 @@ public class KategorieListe extends HashSet<String> {
 		int count = 0;
 		for (String s : this) {
 			arr[count] = s;
+			count++;
 		}
 		return arr;
 	}
