@@ -248,7 +248,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	         public void actionPerformed(ActionEvent arg0) {
 	        	 String input = createCategoryInput.getText();
 	        	 int index = Arrays.asList(categories).indexOf(input);
-	        	 if(index > -1) {
+	        	 if(index > -1 && !input.equals("Keine Kategorie")) {
 	        		 
 	        		 String[] copy = new String[categories.length-1];
 	        		 
