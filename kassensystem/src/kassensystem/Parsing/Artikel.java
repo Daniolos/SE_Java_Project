@@ -90,8 +90,10 @@ public class Artikel {
 
 		try
 		{
-		if (!anzahl.matches("[0-9]*(,|.)?[0-9]+")) {
-			if (anzahl.equals("n")) {
+		if (!anzahl.matches("[0-9]*(,|.)?[0-9]+")) 
+		{
+			if (anzahl.equals("n")) 
+			{
 				return true;
 			}
 			return false;
@@ -115,15 +117,22 @@ public class Artikel {
 	 */
 	public boolean checkPreis(String preis) {
 
-		if (!preis.matches("[0-9]*(,|.)?[0-9]+")) {
-			return false;
+		if (!preis.matches("[0-9]*(,|.)?[0-9]+")) 
+		{
+			if (preis.equals("n")) 
+			{
+				return true;
+			}
+				return false;
 		}
 		
 		try {
 			if (0.001 <= Float.parseFloat(preis.replace(",", ".")) && Float.parseFloat(preis.replace(",", ".")) <= 100000) {
 				return true;
 			}
-		} catch (NumberFormatException e) {
+		} 
+		catch (NumberFormatException e) 
+		{
 			e.printStackTrace();
 			System.err.println("Ungültige Eingabe bei Preis.");
 			return false;
