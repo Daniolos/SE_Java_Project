@@ -39,7 +39,7 @@ public class Artikel {
 			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			System.err.println("Ungültige Eingabe bei peinheit.");
+			System.err.println("Ungültige Eingabe bei Preiseinheit.");
 			return false;
 		}
 	}
@@ -69,10 +69,10 @@ public class Artikel {
 		}
 
 		try {
-			if (((einheit == "g") && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 100000))
-				|| ((einheit == "kg") && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100))
-				|| ((einheit == "l") && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100))
-				|| ((einheit == "ml") && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 10000))) {
+			if (((einheit.equals("g")) && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 100000))
+				|| ((einheit.equals("kg")) && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100))
+				|| ((einheit.equals("l")) && (Float.parseFloat(gewicht) >= 0.1) && (Float.parseFloat(gewicht) <= 100))
+				|| ((einheit.equals("ml")) && (Float.parseFloat(gewicht) >= 1) && (Float.parseFloat(gewicht) <= 10000))) {
 				
 				return true;
 			}
@@ -200,11 +200,11 @@ public class Artikel {
 		setKategorie(kategorie);
 		setEan(ean);
 		setpeinheit(peinheit);
+		setEinheit(einheit);
 		setGewicht(gewicht);
 		setAnzahl(anzahl);
 		setPreis(preis);
 		setGrundpreis(grundpreis);
-		setEinheit(einheit);
 	}
 
 	/**
