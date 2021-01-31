@@ -202,6 +202,9 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 suche();
 	        	 
         		 int selectedRow = bestandsListe.getSelectedRow();
+        		 String ean = (String) bestandsListeModel.getValueAt( selectedRow, 1);
+        		 
+        		 lager.delete(ean);
         		 
         		 String[][] copy = new String[dataBestand.length-1][];
         		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
@@ -231,9 +234,8 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        		 categoryModel.addElement(input);
 	        		 
 	        		 createCategoryInput.setText("");
-	        	 } else {
-	        		 System.out.println(input);
-	        		 System.out.println(index);
+	        		 
+	        		 lager.getKategorien().addKategorie(input);
 	        	 }
 	         }
 	  
@@ -256,6 +258,8 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        		 categories = Arrays.copyOf(copy, copy.length);
 	        		 
 	        		 categoryModel.removeElement(input);
+	        		 
+	        		 lager.getKategorien().removeKategorie(input, lager.getArtikel());
 	        		
 	        		 createCategoryInput.setText("");
 	        	 }
@@ -427,24 +431,64 @@ public class Filialleitung extends JFrame implements ActionListener {
         			 return;
         		 }
         		 
-        		 String[][] copy = new String[dataBestand.length-1][];
-        		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
-        		     if (i != selectedRow) {
-        		         copy[j++] = dataBestand[i];
-        		     }
-        		 }
-        		 dataBestand = Arrays.copyOf(copy, copy.length);
+        		 int check = lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
+	        	 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
 	        	 
-	        	 bestandsListeModel.removeRow(selectedRow);
-	        	 
-	        	 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
-	        	 dataBestand[dataBestand.length-1] = completeArticle;
-	     		
-	        	 bestandsListeModel.addRow(completeArticle);
-	        	 
-	        	 clearForm();
-	        	 formularPanel.setVisible(false);
-	        	 removeButton.setEnabled(true);
+	        	 switch(check) {
+	        	  case -1:
+	        		fehlermeldungLabel.setText("Name ungültig");
+	        	    break;
+	        	  case -2:
+	        		fehlermeldungLabel.setText("EAN ungültig");
+	        	    break;
+	        	  case -3:
+	        		fehlermeldungLabel.setText("Stückpreis ungültig");
+	        	    break;
+	        	  case -4:
+	        		fehlermeldungLabel.setText("Stückzahl ungültig");
+	        	    break;
+	        	  case -5:
+	        		fehlermeldungLabel.setText("Grundpreis ungültig");
+	        	    break;
+	        	  case -6:
+	        		fehlermeldungLabel.setText("Grundpreiseinheit ungültig");
+	        	    break;
+	        	  case -7:
+	        		fehlermeldungLabel.setText("Menge ungültig");
+	        	    break;
+	        	  case -8:
+	        		fehlermeldungLabel.setText("Mengeneinheit ungültig");
+	        	    break;
+	        	  case -9:
+	        		fehlermeldungLabel.setText("Kategorie ungültig");
+	        	    break;
+	        	  case -10:
+	        		String oldEan = (String) bestandsListeModel.getValueAt( selectedRow, 1);
+	         		lager.delete(oldEan);
+	         		
+	         		lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
+	        		DatenSchreiber.Schreiben();
+	         		
+	         		String[][] copy = new String[dataBestand.length-1][];
+	        		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
+	        		     if (i != selectedRow) {
+	        		         copy[j++] = dataBestand[i];
+	        		     }
+	        		 }
+	        		 dataBestand = Arrays.copyOf(copy, copy.length);
+		        	 
+		        	 bestandsListeModel.removeRow(selectedRow);
+		        	 
+		        	 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
+		        	 dataBestand[dataBestand.length-1] = completeArticle;
+		     		
+		        	 bestandsListeModel.addRow(completeArticle);
+		        	 
+		        	 clearForm();
+		        	 formularPanel.setVisible(false);
+		        	 removeButton.setEnabled(true);
+	        	}
+
 	         }
 	  
 	    });
@@ -507,9 +551,9 @@ public class Filialleitung extends JFrame implements ActionListener {
 		articlePriceInput.setText("");
 		articleQuantityInput.setText("");
 		basePriceInput.setText("");
-		basePriceUnitBox.setSelectedItem(grundPreisEinheiten[0]);
+		basePriceUnitBox.setSelectedItem(0);
 		articleAmountInput.setText("");
-		categoryBox.setSelectedItem(categories[0]);
+		categoryBox.setSelectedItem(0);
 	}
 	
 	private void formularErzeugen() {
@@ -677,4 +721,5 @@ public class Filialleitung extends JFrame implements ActionListener {
 	  
 	    });
 	}
+	
 }
