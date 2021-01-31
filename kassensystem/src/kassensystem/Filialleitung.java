@@ -1,5 +1,3 @@
-package kasino;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -19,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -45,6 +45,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	private JLabel createCategoryLabel;
 	private JTextField createCategoryInput;
 	private JButton createCategoryButton;
+	private JButton deleteCategoryButton;
 	private JTable bestandsListe;
 	private DefaultTableModel bestandsListeModel;
 	private JLabel suchLabel;
@@ -63,12 +64,13 @@ public class Filialleitung extends JFrame implements ActionListener {
 	private JLabel basePriceLabel;
 	private JTextField basePriceInput;
 	private JLabel basePriceUnitLabel;
-	private JComboBox basePriceUnitBox;
+	private JComboBox<String> basePriceUnitBox;
 	private JLabel articleAmountLabel;
 	private JTextField articleAmountInput;
 	private JLabel categoryLabel;
 	private DefaultComboBoxModel<String> categoryModel;
 	private JComboBox<String> categoryBox;
+	private JLabel fehlermeldungLabel;
 	private JButton cancelButton;
 	private JButton submitButton;
 	private JButton clearButton;
@@ -78,11 +80,11 @@ public class Filialleitung extends JFrame implements ActionListener {
 	
 	
 	// Alle Spaltennamen werden in einem String Array gespeichert
-	String[] columnNames = {"Artikelname", "EAN", "Stückpreis (€)", "Stückzahl", "Grundpreis","Gp. Einheit", "Menge","M. Einheit", "Kategorie"};
+	String[] columnNames = {"Artikelname", "EAN", "Stückpreis in €", "Stückzahl", "Grundpreis","Grundpreiseinheit", "Menge","Mengeneinheit", "Kategorie"};
 	
 	String[] categories = {};
-	String[] grundPreisEinheiten = {}; 	
-	String[] mengenEinheiten = {};
+	String[] grundPreisEinheiten = {"€/kg", "€/100g", "€/l", "€/100ml", "n"}; 	
+	String[] mengenEinheiten = {"kg", "g", "l", "ml", "n"};
 	String[][] dataBestand = {};
 	
 	// hier wird die Bidlschirm-Größe mit dem Dimension Object initialisiert
@@ -97,13 +99,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 		DatenLeser bla = new DatenLeser();
 	    XMLParser xml = new XMLParser(bla.getData());
 	    System.out.println(xml.getXML());
-//	    String article = xml.getChild("articles");
+	    //String article = xml.getChild("articles");
 		lager = new Lager(xml.getXML());
 		
-		setGrundPreisEinheiten();
-		setMengenEinheiten();
-		setCategories();
-		setDataBestand();
+		getData();
 		
 		// hier werden alle benötigten Klassen instanziiert
 		setLayout(new BorderLayout());
@@ -112,11 +111,12 @@ public class Filialleitung extends JFrame implements ActionListener {
 		switchButton = new JButton("zu Einkauf wechseln");
 		artikelLabel = new JLabel("Artikel");
 		addButton = new JButton("Artikel Hinzufügen");
-		modifyButton = new JButton("Artikel Ändern");
+		modifyButton = new JButton("Artikel Bearbeiten");
 		removeButton = new JButton("Artikel Löschen");
 		createCategoryLabel = new JLabel("Kategorie"); 
 		createCategoryInput = new JTextField("");
 		createCategoryButton = new JButton("Erstellen");
+		deleteCategoryButton = new JButton("Löschen");
 		suchLabel = new JLabel("Suche");
 		suchInput = new JTextField("");
 		suchButton = new JButton("Eingabe");
@@ -137,6 +137,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 
 	         public void actionPerformed(ActionEvent arg0) {
 	        	 addButton.setEnabled(false);
+	        	 removeButton.setEnabled(true);
 	        	 clearForm();
 	        	 submitModificationsButton.setVisible(false);
 	        	 formularPanel.setVisible(true);
@@ -149,13 +150,12 @@ public class Filialleitung extends JFrame implements ActionListener {
 		modifyButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
-	        	 // fill the form with data from a selected a row
-	        	 // make changes to the row and save them
+	        	 
 	        	 if (bestandsListe.getSelectedRow() == -1) {
         			 return;
-        		 }
+	        	 }
 	        	 
-        		 suchInput.setText("");
+	        	 suchInput.setText("");
 	        	 suche();
 	        	 
 	        	 int selectedRow = bestandsListe.getSelectedRow();
@@ -193,17 +193,17 @@ public class Filialleitung extends JFrame implements ActionListener {
 		removeButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
-	        	 // remove a selected row
+	        	 
 	        	 if (bestandsListe.getSelectedRow() == -1) {
         			 return;
         		 }
-      		 
-        		 suchInput.setText("");
+	        	 
+	        	 suchInput.setText("");
 	        	 suche();
 	        	 
         		 int selectedRow = bestandsListe.getSelectedRow();
         		 
-        		 String[][] copy = Arrays.copyOf(dataBestand, dataBestand.length-1);
+        		 String[][] copy = new String[dataBestand.length-1][];
         		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
         		     if (i != selectedRow) {
         		         copy[j++] = dataBestand[i];
@@ -221,14 +221,42 @@ public class Filialleitung extends JFrame implements ActionListener {
 		createCategoryButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
-	        	 if (!createCategoryInput.getText().equals("")) {
-	        		 String input = createCategoryInput.getText();
+	        	 String input = createCategoryInput.getText();
+	        	 int index = Arrays.asList(categories).indexOf(input);
+	        	 if (!input.equals("") & index == -1) {
 	        		 
 	        		 categories = Arrays.copyOf(categories, categories.length+1);
 	        		 categories[categories.length-1] = input;
 	        		 
 	        		 categoryModel.addElement(input);
 	        		 
+	        		 createCategoryInput.setText("");
+	        	 } else {
+	        		 System.out.println(input);
+	        		 System.out.println(index);
+	        	 }
+	         }
+	  
+	    });
+		
+		deleteCategoryButton.addActionListener(new ActionListener() {
+
+	         public void actionPerformed(ActionEvent arg0) {
+	        	 String input = createCategoryInput.getText();
+	        	 int index = Arrays.asList(categories).indexOf(input);
+	        	 if(index > -1) {
+	        		 
+	        		 String[] copy = new String[categories.length-1];
+	        		 
+	        		 for (int i = 0, j = 0; i < categories.length; i++) {
+	        		     if (i != index) {
+	        		         copy[j++] = categories[i];
+	        		     }
+	        		 }
+	        		 categories = Arrays.copyOf(copy, copy.length);
+	        		 
+	        		 categoryModel.removeElement(input);
+	        		
 	        		 createCategoryInput.setText("");
 	        	 }
 	         }
@@ -237,10 +265,9 @@ public class Filialleitung extends JFrame implements ActionListener {
 		
 		suchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		  		suche();
+				suche();
 		  	}
 		});
-
 	
 		
 		articleNameLabel = new JLabel("Artikelname");
@@ -261,9 +288,13 @@ public class Filialleitung extends JFrame implements ActionListener {
 		categoryModel = new DefaultComboBoxModel<String>(categories);
 		categoryBox = new JComboBox<>(categoryModel);
 		submitButton = new JButton("Artikel Hinzufügen");
-		submitModificationsButton = new JButton("Artikel Ändern");
+		submitModificationsButton = new JButton("Artikel Bearbeiten");
 		clearButton = new JButton("Formular leeren");
 		cancelButton = new JButton("Abbrechen");
+		fehlermeldungLabel = new JLabel("");
+		
+		constraintForm();
+		
 		
 		clearButton.addActionListener(new ActionListener() { 
 			public void actionPerformed(ActionEvent arg0) {
@@ -285,8 +316,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 		submitButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
-	        	 removeButton.setEnabled(true);
-	        	 addButton.setEnabled(true);
 	        	 
 	        	 String name = articleNameInput.getText();
 	        	 String ean = eanInput.getText();
@@ -311,21 +340,55 @@ public class Filialleitung extends JFrame implements ActionListener {
 	     				category
 	     			};
 	        	 
-	        	 //hier überprüfen ob die eingegebenen Eigenschaften in ordnung sind
- 
+	        	 //hier Überprüfen ob die eingegebenen Eigenschaften in ordnung sind
 	        	 int check = lager.ArtikelHinzufuegen(name, ean, articlePrice, articleQuantity, basePrice, basePriceUnit, articleAmount, articleAmountUnit, category);
 	        	 DatenSchreiber DatenSchreiber = new DatenSchreiber(lager);
 	        	 
-	        	 DatenSchreiber.Schreiben();
-	        	 
-	        	 
-	        	 
-	        	 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
-	        	 dataBestand[dataBestand.length-1] = completeArticle;
-	     		
-	        	 bestandsListeModel.addRow(completeArticle);
-	        	 clearForm();
-	        	 formularPanel.setVisible(false);
+	        	 switch(check) {
+	        	  case -1:
+	        		fehlermeldungLabel.setText("Name ungültig");
+	        	    break;
+	        	  case -2:
+	        		fehlermeldungLabel.setText("EAN ungültig");
+	        	    break;
+	        	  case -3:
+	        		fehlermeldungLabel.setText("Stückpreis ungültig");
+	        	    break;
+	        	  case -4:
+	        		fehlermeldungLabel.setText("Stückzahl ungültig");
+	        	    break;
+	        	  case -5:
+	        		fehlermeldungLabel.setText("Grundpreis ungültig");
+	        	    break;
+	        	  case -6:
+	        		fehlermeldungLabel.setText("Grundpreiseinheit ungültig");
+	        	    break;
+	        	  case -7:
+	        		fehlermeldungLabel.setText("Menge ungültig");
+	        	    break;
+	        	  case -8:
+	        		fehlermeldungLabel.setText("Mengeneinheit ungültig");
+	        	    break;
+	        	  case -9:
+	        		fehlermeldungLabel.setText("Kategorie ungültig");
+	        	    break;
+	        	  case -10:
+	        		fehlermeldungLabel.setText("Artikel vorhanden");
+	        	    break;
+	        	  case 0:
+	        		  DatenSchreiber.Schreiben();
+	        		  
+	        		 dataBestand = Arrays.copyOf(dataBestand, dataBestand.length+1);
+	 	        	 dataBestand[dataBestand.length-1] = completeArticle;
+	 	     		
+	 	        	 bestandsListeModel.addRow(completeArticle);
+	 	        	 clearForm();
+	 	        	 formularPanel.setVisible(false);
+	 	        	 
+	 	        	 removeButton.setEnabled(true);
+		        	 addButton.setEnabled(true);
+	        	}
+
 	         }
 	  
 	    });
@@ -333,7 +396,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 		submitModificationsButton.addActionListener(new ActionListener() {
 
 	         public void actionPerformed(ActionEvent arg0) {
-	        	 removeButton.setEnabled(true);
 	        	 
 	        	 String name = articleNameInput.getText();
 	        	 String ean = eanInput.getText();
@@ -358,14 +420,14 @@ public class Filialleitung extends JFrame implements ActionListener {
 	     				category
 	     			};
 	        	 
-	        	 //hier überprüfen ob die eingegeben Eigenschaften in Ordnung sind
+	        	 //hier Überprüfen ob die eingegeben Eigenschaften in Ordnung sind
 	        	 
 	        	 int selectedRow = selectedForModification;
         		 if (selectedRow == -1) {
         			 return;
         		 }
         		 
-        		 String[][] copy = Arrays.copyOf(dataBestand, dataBestand.length-1);
+        		 String[][] copy = new String[dataBestand.length-1][];
         		 for (int i = 0, j = 0; i < dataBestand.length; i++) {
         		     if (i != selectedRow) {
         		         copy[j++] = dataBestand[i];
@@ -379,30 +441,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 dataBestand[dataBestand.length-1] = completeArticle;
 	     		
 	        	 bestandsListeModel.addRow(completeArticle);
+	        	 
 	        	 clearForm();
 	        	 formularPanel.setVisible(false);
-	         }
-	  
-	    });
-		
-		basePriceUnitBox.addActionListener(new ActionListener() {
-
-	         public void actionPerformed(ActionEvent arg0) {
-	        	 try {
-			        	 String basePriceUnitValue = String.valueOf(basePriceUnitBox.getSelectedItem());
-			        	 int index = Arrays.asList(grundPreisEinheiten).indexOf(basePriceUnitValue);
-			        	 if (basePriceUnitValue == "n"){ 
-			        		 articleAmountInput.setEnabled(false);
-			        		 articleAmountInput.setText("n");
-			        		 articleAmountLabel.setText("Mengenangabe nicht möglich");
-			        	 } else {
-			        		 articleAmountInput.setEnabled(true);
-			        		 articleAmountLabel.setText("Menge in "+ mengenEinheiten[index]);
-			        		 articleAmountInput.setText("");
-			        	 }
-	        	 } catch(Exception ex) {
-	        		 System.out.println(ex);
-	        	 }
+	        	 removeButton.setEnabled(true);
 	         }
 	  
 	    });
@@ -416,28 +458,18 @@ public class Filialleitung extends JFrame implements ActionListener {
 
 	}
 	
-	private void setGrundPreisEinheiten() {
-		//import Array from DataBase
-		String[] unitsFromDB = { "€/kg", "€/100g", "€/l", "€/100ml", "n"};
-		grundPreisEinheiten = Arrays.copyOf(unitsFromDB, unitsFromDB.length);
-		
+	public void getData() {
+		getCategories();
+		getDataBestand();
 	}
 	
-	private void setMengenEinheiten() {
-		//import Array from DataBase
-		String[] unitsFromDB = { "kg", "g", "l", "ml", "n"};
-		mengenEinheiten = Arrays.copyOf(unitsFromDB, unitsFromDB.length);
-	}
-	
-	private void setCategories() {
+	public void getCategories() {
 		//import 
 		String[] categoriesFromDB = lager.getKategorien().toStringArray();
 		categories = Arrays.copyOf(categoriesFromDB, categoriesFromDB.length);
-		System.out.println(Arrays.toString(categoriesFromDB));
-		System.out.println(Arrays.toString(categories));
 	}
 
-	private void setDataBestand() {
+	public void getDataBestand() {
 		//import Array from Database
 		String[][] dataFromDB = lager.toStringArray();
 		dataBestand = Arrays.copyOf(dataFromDB, dataFromDB.length);
@@ -462,14 +494,22 @@ public class Filialleitung extends JFrame implements ActionListener {
 	}
 	
 	private void clearForm() {
+		articleNameInput.setEnabled(true);
+		eanInput.setEnabled(true);
+		articlePriceInput.setEnabled(true);
+		articleQuantityInput.setEnabled(true);
+		basePriceInput.setEnabled(true);
+		basePriceUnitBox.setEnabled(true);
+		articleAmountInput.setEnabled(true);
+		categoryBox.setEnabled(true);
 		articleNameInput.setText("");
 		eanInput.setText("");
 		articlePriceInput.setText("");
 		articleQuantityInput.setText("");
 		basePriceInput.setText("");
-		basePriceUnitBox.setSelectedItem(0);
+		basePriceUnitBox.setSelectedItem(grundPreisEinheiten[0]);
 		articleAmountInput.setText("");
-		categoryBox.setSelectedItem(0);
+		categoryBox.setSelectedItem(categories[0]);
 	}
 	
 	private void formularErzeugen() {
@@ -499,6 +539,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 		formularPanel.add(clearButton);
 		formularPanel.add(submitModificationsButton);
 		submitModificationsButton.setVisible(false);
+		formularPanel.add(fehlermeldungLabel);
 	}
 	
 	private void interaktionenErzeugen() {
@@ -514,6 +555,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 		interactionsPanel.add(createCategoryLabel);
 		interactionsPanel.add(createCategoryInput);
 		interactionsPanel.add(createCategoryButton);
+		interactionsPanel.add(deleteCategoryButton);
 		interactionsPanel.add(suchLabel);
 		interactionsPanel.add(suchInput);
 		interactionsPanel.add(suchButton);
@@ -548,5 +590,91 @@ public class Filialleitung extends JFrame implements ActionListener {
 		
 	}
 	
-	
+	private void constraintForm(){
+		articlePriceInput.getDocument().addDocumentListener(new DocumentListener() {
+			
+			private void handleChange() {
+				String priceValue = articlePriceInput.getText();
+				String baseUnitValue = String.valueOf(basePriceUnitBox.getSelectedItem());
+	        	if(priceValue.equals("n")) {
+	        		articleQuantityInput.setEnabled(false);
+	        		articleQuantityInput.setText("n");
+	        		if(!baseUnitValue.equals("n")) {
+	        			articleAmountInput.setEnabled(true);
+	        		}
+	        	} else if(priceValue.equals("")) {
+	        		articleQuantityInput.setEnabled(true);
+	        		if(!baseUnitValue.equals("n")) {
+	        			articleAmountInput.setEnabled(true);
+	        		}
+	        	}
+	        	else {
+	        		articleQuantityInput.setEnabled(true);
+	        		articleAmountInput.setEnabled(false);
+	        		articleAmountInput.setText("n");
+	        	}
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				handleChange();
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				handleChange();
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {}
+		});
+		
+		basePriceInput.getDocument().addDocumentListener(new DocumentListener() {
+			
+			private void handleChange() {
+				String baseValue = basePriceInput.getText();
+	        	if(baseValue.equals("n")) {
+	        		basePriceUnitBox.setEnabled(false);
+	        		basePriceUnitBox.setSelectedItem("n");
+	        	} else {
+	        		basePriceUnitBox.setEnabled(true);
+	        		basePriceUnitBox.setSelectedItem(mengenEinheiten[0]);
+	        	}
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				handleChange();
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				handleChange();
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {}
+		});
+		
+		basePriceUnitBox.addActionListener(new ActionListener() {
+
+	         public void actionPerformed(ActionEvent arg0) {
+	        	 try {
+	        		 String quantity = articleQuantityInput.getText();
+	        		 String basePriceUnitValue = String.valueOf(basePriceUnitBox.getSelectedItem());
+		        	 if (basePriceUnitValue == "n"){ 
+		        		 articleAmountInput.setEnabled(false);
+		        		 articleAmountInput.setText("n");
+		        		 articleAmountLabel.setText("keine Mengenangabe");
+		        	 } else if(!quantity.equals("n") & !quantity.equals("")) {
+		        		 articleAmountInput.setEnabled(false);
+		        		 articleAmountInput.setText("n");
+		        		 articleAmountLabel.setText("keine Mengenangabe");
+		        	 } else{
+		        		 articleAmountInput.setEnabled(true);
+		        		 articleAmountLabel.setText("Menge in "+ basePriceUnitValue);
+		        	 }
+	        	 } catch(Exception ex) {
+	        		 System.out.println(ex);
+	        	 }
+	         }
+	  
+	    });
+	}
 }
