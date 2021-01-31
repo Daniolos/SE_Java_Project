@@ -40,7 +40,7 @@ public class DatenSchreiber {
 	 * fertige XML-Datei (als String), die mit dem Aufruf der Methode Schreiben() in
 	 * die Datei geschrieben werden kann.
 	 * 
-	 * @param lager			enthält alle Artikel in Form einer LinkedList<Artikel>
+	 * @param lager enthält alle Artikel in Form einer LinkedList<Artikel>
 	 */
 	public DatenSchreiber(Lager lager) {
 		this.lager = lager;
@@ -77,8 +77,8 @@ public class DatenSchreiber {
 	 * Die Methode wandelt den Datentyp Artikel in einen String im XML-Format um und
 	 * gibt diesen String zurück
 	 * 
-	 * @param article		Ein Artikel wird übergeben
-	 * @return 				Der Artikel in XML-Form wird zurückgegeben
+	 * @param article Ein Artikel wird übergeben
+	 * @return Der Artikel in XML-Form wird zurückgegeben
 	 */
 	private String ArtikelXML(Artikel article) {
 		String xmlString = "\t<article>\n";

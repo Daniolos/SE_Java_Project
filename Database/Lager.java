@@ -21,7 +21,7 @@ public class Lager {
 	 * XML-Datei (ohne Header) enthält und liest daraus alle Artikel in das Lager
 	 * und erstellt eine KategorieListe
 	 * 
-	 * @param xml		XML-Datei (ohne Header) als String
+	 * @param xml XML-Datei (ohne Header) als String
 	 */
 	public Lager(String xml) {
 		articles = new LinkedList<Artikel>();
@@ -39,7 +39,7 @@ public class Lager {
 	 * beziehungsweise End-Tag <articles> </articles> der alle Artikel umschließt)
 	 * in this.articleMarkup
 	 * 
-	 * @param xml			XML-Datei als String, ohne Header
+	 * @param xml XML-Datei als String, ohne Header
 	 */
 	private void setAllArticlesFromString(String xml) {
 		articleMarkup = XMLParser.getChild(xml, "articles");
@@ -65,7 +65,7 @@ public class Lager {
 	/**
 	 * Getter-Methode für die Artikelliste
 	 * 
-	 * @return 				Liste mit allen Artikeln
+	 * @return Liste mit allen Artikeln
 	 */
 	public LinkedList<Artikel> getArtikel() {
 		return articles;
@@ -74,7 +74,7 @@ public class Lager {
 	/**
 	 * Getter-Methode für die Kategorieliste
 	 * 
-	 * @return 				HashSet mit allen Kategorien als Strings
+	 * @return HashSet mit allen Kategorien als Strings
 	 */
 	public KategorieListe getKategorien() {
 		return kategorien;
@@ -84,7 +84,7 @@ public class Lager {
 	 * Fügt Artikel der Artikelliste hinzu, wenn dessen Name und EAN nicht leere
 	 * Strings sind
 	 * 
-	 * @param article		Der Artikel der der Liste hinzugefügt werden soll.
+	 * @param article Der Artikel der der Liste hinzugefügt werden soll.
 	 */
 	public void ArtikelHinzufuegen(Artikel article) {
 		if (!article.getName().equals("") && !article.getEan().equals(""))
@@ -98,15 +98,15 @@ public class Lager {
 	 * zulässig sind. Ist eine das nicht, wird ein entsprechender Fehlercode
 	 * zurückgegeben.
 	 * 
-	 * @param name			Name (Fehlercode -1)
-	 * @param ean			EAN (Fehlercode -2)
-	 * @param preis		 	Stückpreis (Fehlercode -3)
-	 * @param anzahl		Anzahl im Lager (Fehlercode -4)
-	 * @param grundpreis 	Grundpreis (Fehlercode -5)
-	 * @param preiseinheit	Grundpreiseinheit (Fehlercode -6)
-	 * @param gewicht		Menge, zum Beispiel Gewicht, Volumen (Fehlercode -7)
-	 * @param einheit		Mengeneinheit (Fehlercode -8)
-	 * @param kategorie		Kategorie (Fehlercode -9)
+	 * @param name         Name (Fehlercode -1)
+	 * @param ean          EAN (Fehlercode -2)
+	 * @param preis        Stückpreis (Fehlercode -3)
+	 * @param anzahl       Anzahl im Lager (Fehlercode -4)
+	 * @param grundpreis   Grundpreis (Fehlercode -5)
+	 * @param preiseinheit Grundpreiseinheit (Fehlercode -6)
+	 * @param gewicht      Menge, zum Beispiel Gewicht, Volumen (Fehlercode -7)
+	 * @param einheit      Mengeneinheit (Fehlercode -8)
+	 * @param kategorie    Kategorie (Fehlercode -9)
 	 * @return int Fehlercode < 0, oder wenn alles glattgelaufen ist 0
 	 */
 	public int ArtikelHinzufuegen(String name, String ean, String preis, String anzahl, String grundpreis,
@@ -119,7 +119,7 @@ public class Lager {
 				return (i + 1) * (-1); // gibt (index der Eigenschaft + 1) * -1 zurück, für Fehler bei Eigenschaft
 			}
 		}
-		
+
 		for (Artikel a : articles) {
 			if (new EanVerifizierer(ean).getformatierteEan().equals(a.getEan())) {
 				return -10; // gibt -10 zurück, wenn Artikel schon in Liste ist
@@ -131,12 +131,14 @@ public class Lager {
 	}
 
 	/**
-	 * Diese Methode bekommt einen Artikelnamen oder eine EAN übergeben, nach welchem/welcher dann im Lager/der Artikelliste gesucht wird.
+	 * Diese Methode bekommt einen Artikelnamen oder eine EAN übergeben, nach
+	 * welchem/welcher dann im Lager/der Artikelliste gesucht wird.
 	 * 
-	 * @param nameOrEan - Übergebener String, nach dem in der Artikelliste gesucht werden soll.
+	 * @param nameOrEan - Übergebener String, nach dem in der Artikelliste gesucht
+	 *                  werden soll.
 	 * @return
 	 */
-	
+
 	public Artikel search(String nameOrEan) {
 		EanVerifizierer eanVerifizierer = new EanVerifizierer(nameOrEan);
 
@@ -154,7 +156,7 @@ public class Lager {
 	 * Löscht einen Artikel über eine EAN oder PLU aus der Artikelliste. Ist die EAN
 	 * oder PLU ungültig, passiert gar nichts.
 	 * 
-	 * @param ean		EAN, die aus der Artikelliste gelöscht werden soll.
+	 * @param ean EAN, die aus der Artikelliste gelöscht werden soll.
 	 */
 	public void delete(String ean) {
 
@@ -177,7 +179,7 @@ public class Lager {
 	 * Löscht einen übergebenen Artikel aus der Artikelliste. Ist die EAN des
 	 * Artikels ungültig, passiert gar nichts.
 	 * 
-	 * @param erase		Der Artikel, der gelöscht werden soll
+	 * @param erase Der Artikel, der gelöscht werden soll
 	 */
 	public void delete(Artikel erase) {
 
@@ -200,7 +202,7 @@ public class Lager {
 	 * Methode, die Artikelliste in ein zweidimensionales Array umwandelt. Jeder
 	 * Index in dem Array ist ein Artikel (siehe auch: Artikel.toStringArray())
 	 * 
-	 * @return 			zweidimensionales Array in dem jeder Index ein Artikel ist
+	 * @return zweidimensionales Array in dem jeder Index ein Artikel ist
 	 */
 	public String[][] toStringArray() {
 		String[][] arr = new String[articles.size()][9];
