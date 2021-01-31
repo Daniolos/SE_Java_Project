@@ -29,7 +29,6 @@ import Parsing.XMLParser;
 
 
 public class Filialleitung extends JFrame implements ActionListener {
-	// hier werden alle benötigten Klassen deklariert
 	// Hier sind alle Interaktionsvariablen
 	private JPanel formularPanel;
 	private JPanel interactionsPanel;
@@ -82,6 +81,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	// Alle Spaltennamen werden in einem String Array gespeichert
 	String[] columnNames = {"Artikelname", "EAN", "Stückpreis in €", "Stückzahl", "Grundpreis","Grundpreiseinheit", "Menge","Mengeneinheit", "Kategorie"};
 	
+	//Hier werden in der Klasse die Artikeleigenschaften verwart
 	static String[] categories = {};
 	String[] grundPreisEinheiten = {"€/kg", "€/100g", "€/l", "€/100ml", "n"}; 	
 	String[] mengenEinheiten = {"kg", "g", "l", "ml", "n"};
@@ -94,7 +94,12 @@ public class Filialleitung extends JFrame implements ActionListener {
 	
 	
 	
-	
+	/**
+	 * Filialleitung ist der Konstruktor der Klasse 
+	 * Hier werden alle GUI Elemente wie Panels und Buttons instanziert und zur contentPane hinzugefügt
+	 * Auf JButtons und JComboBoxes werden ActionListener gesetzt
+	 * Auf JTextFields werden werden DocumentListener angewandt
+	 */
 	public Filialleitung() {
 		DatenLeser bla = new DatenLeser();
 	    XMLParser xml = new XMLParser(bla.getData());
@@ -103,7 +108,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 		
 		getData();
 		
-		// hier werden alle benötigten Klassen instanziiert
 		setLayout(new BorderLayout());
 		formularPanel = new JPanel();
 		interactionsPanel = new JPanel();
@@ -509,23 +513,37 @@ public class Filialleitung extends JFrame implements ActionListener {
 
 	}
 	
+	/**
+	 * getData führt die Funktionen getCategories und getDataBestand aus
+	 */
 	public static void getData() {
 		getCategories();
 		getDataBestand();
 	}
 	
+	/**
+	 * Die Funktion füllt die variable categories mit den Kategorien aus der Datenbank
+	 */
 	public static void getCategories() {
 		//import 
 		String[] categoriesFromDB = lager.getKategorien().toStringArray();
 		categories = Arrays.copyOf(categoriesFromDB, categoriesFromDB.length);
 	}
-
+	
+	/**
+	 * Die Funktion füllt die Variable dataBestand mit Artikeln aus der Datenbank
+	 */
 	public static void getDataBestand() {
 		//import Array from Database
 		String[][] dataFromDB = lager.toStringArray();
 		dataBestand = Arrays.copyOf(dataFromDB, dataFromDB.length);
 	}
-
+	
+	
+	/**
+	 * die Mainmethode wird nicht ausgeführt und ist nur für Testzwecke vorhanden
+	 * @param args
+	 */
 	public static void main(String[] args) 
 	{
 		Filialleitung admin = new Filialleitung();
@@ -535,6 +553,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 		admin.setVisible(true);
 	}
 	
+	/**
+	 * Die suche zeigt die, in die Suchzeile eingegebenen, Artikel an
+	 * Es wird nach Artikelnamen und EAN gefiltert
+	 */
 	private void suche() {
 		String text = suchInput.getText();
   		if (text.length() == 0) {
@@ -544,6 +566,9 @@ public class Filialleitung extends JFrame implements ActionListener {
   		}
 	}
 	
+	/**
+	 * clearForm() leert alle Textfelder und macht sie bearbeitbar
+	 */
 	private void clearForm() {
 		articleNameInput.setEnabled(true);
 		eanInput.setEnabled(true);
@@ -563,8 +588,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 		categoryBox.setSelectedItem(0);
 	}
 	
+	/**
+	 * hier werden alle Funktionen die mit dem Erstellen der Formular GUI zu tun haben gesammelt
+	 */
 	private void formularErzeugen() {
-		// Formular
 		this.getContentPane().add(formularPanel, BorderLayout.WEST);
 		formularPanel.setPreferredSize(new Dimension((int)screenWidth * 2 / 10,(int) screenHeight - 200));
 		formularPanel.setLayout(new GridLayout(15,2,5,5));
@@ -593,8 +620,10 @@ public class Filialleitung extends JFrame implements ActionListener {
 		formularPanel.add(fehlermeldungLabel);
 	}
 	
+	/**
+	 * hier werden alle Funktionen die mit dem Erstellen der Interaktionen GUI zu tun haben gesammelt
+	 */
 	private void interaktionenErzeugen() {
-		// Hier finden alle Interaktionen statt
 		this.getContentPane().add(interactionsPanel, BorderLayout.CENTER);
 		interactionsPanel.setLayout(new GridLayout(15,1,5,5));
 		interactionsPanel.setBorder(BorderFactory.createTitledBorder("Interaktionen"));
@@ -612,6 +641,9 @@ public class Filialleitung extends JFrame implements ActionListener {
 		interactionsPanel.add(suchButton);
 	}
 	
+	/**
+	 * hier werden alle Funktionen die mit dem Erstellen der Bestandslisten GUI zu tun haben gesammelt
+	 */
 	private void bestandsListeErzeugen() {
 		//Bestandslisten GUI
 		bestandsListePanel = new JPanel();
@@ -634,13 +666,17 @@ public class Filialleitung extends JFrame implements ActionListener {
 		tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
 		bestandsListe.setRowSorter(tr);
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	/**
+	 * Hier wird eingegrenzt welche Textfelder nach Eingabe in bestimmte andere Textfelder deaktiviert werden und mit n aufgefüllt werden
+	 * Es ist ein extra Feature um Zeit bei der Eingabe zu sparen und um dafür zu sorgen, dass die richtigen Felder benutzt werden
+	 */
 	private void constraintForm(){
 		articlePriceInput.getDocument().addDocumentListener(new DocumentListener() {
 			
