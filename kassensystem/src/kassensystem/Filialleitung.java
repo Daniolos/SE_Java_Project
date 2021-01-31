@@ -228,7 +228,8 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 String input = createCategoryInput.getText();
 	        	 int index = Arrays.asList(categories).indexOf(input);
 	        	 if (!input.equals("") & index == -1) {
-	        		 
+	        		 if ((input.matches("[a-zäöüßA-ZÄÖÜ]+")) && (3 <= input.length()) && (input.length() <= 32))
+	        		 {
 	        		 categories = Arrays.copyOf(categories, categories.length+1);
 	        		 categories[categories.length-1] = input;
 	        		 
@@ -237,6 +238,7 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        		 createCategoryInput.setText("");
 	        		 
 	        		 lager.getKategorien().addKategorie(input);
+	        		 }
 	        	 }
 	         }
 	  
