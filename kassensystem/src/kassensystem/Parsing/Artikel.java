@@ -124,6 +124,8 @@ public class Artikel {
 	 * @return			Ist der übergebene String ein zulässiger Stückpreis?
 	 */
 	public boolean checkPreis(String preis) {
+		if (preis.matches("0"))
+			return false;
 
 		if (!preis.matches("[0-9]*(,|.)?[0-9]+")) 
 		{
@@ -135,8 +137,8 @@ public class Artikel {
 		}
 		
 		try {
-			if (0.001 <= Float.parseFloat(preis.replace(",", ".")) && Float.parseFloat(preis.replace(",", ".")) <= 100000) {
-				return true;
+			if (!(0.01 <= Float.parseFloat(preis.replace(",", ".")) && Float.parseFloat(preis.replace(",", ".")) <= 100000)) {
+				return false;
 			}
 		} 
 		catch (NumberFormatException e) 
@@ -155,21 +157,23 @@ public class Artikel {
 	 * @return				Ist der übergebene String ein zulässiger Grundpreis?
 	 */
 	public boolean checkGrundpreis(String grundpreis) {
+		if (grundpreis.matches("0"))
+			return false;
 
 		if (!grundpreis.matches("[0-9]*(,|.)?[0-9]+")) {
 			return false;
 		}
 		
 		try {
-			if (0.001 <= Float.parseFloat(grundpreis.replace(",", ".")) && Float.parseFloat(grundpreis.replace(",", ".")) <= 100000) {
-				return true;
+			if (!(0.01 <= Float.parseFloat(grundpreis.replace(",", ".")) && Float.parseFloat(grundpreis.replace(",", ".")) <= 100000)) {
+				return false;
 			}
+			return true;
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			System.err.println("Ungültige Eingabe bei Grundpreis.");
 			return false;
 		}
-		return true;
 	}
 
 	/**
