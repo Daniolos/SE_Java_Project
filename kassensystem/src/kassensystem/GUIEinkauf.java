@@ -147,6 +147,23 @@ public class GUIEinkauf extends JFrame
 		}
 	 }
 
+	/**
+	 * Hier werden alle Artikel aus der xml-Datei ausgelesen
+	 * @param data
+	 */
+	public void fillTable(DefaultTableModel data)
+	{
+			DatenLeser bla = new DatenLeser();
+		    XMLParser xml = new XMLParser(bla.getData());
+		    String article = xml.getChild("articles");
+			lager = new Lager(xml.getXML());
+			String[][] Array = lager.toStringArray();
+			for (int i = 0; i < Array.length; i++)
+			{
+				data.addRow(Array[i]);
+			}
+	}
+	
 	public GUIEinkauf() 
 	{
 		//Initialisierung aller graphischen Elemente
@@ -158,8 +175,8 @@ public class GUIEinkauf extends JFrame
 		addButton = new JButton("Hinzufügen");
 		removeButton = new JButton("Ausgewähltes Element entfernen");
 		removeAllButton = new JButton("Alles entfernen");
-		insertValue = new JTextField("Hier Wert eingeben. ");
-		mengeHinweisArea = new JTextArea("Beachte! \nDie Menge muss in der Einheit angegeben werden,\n wie diese auch ein der Bestandsliste in der Spalte Menge angegeben ist. \nKommata bitte als Punkt angeben (z.B. 2.3). Zum Abbrechen '0' eingeben.");
+		insertValue = new JTextField("");
+		mengeHinweisArea = new JTextArea("Hier Menge eingeben. Beachte! \nDie Menge muss in der Einheit angegeben werden,\nwie diese auch ein der Bestandsliste in der Spalte Menge angegeben ist. \nKommata bitte als Punkt angeben (z.B. 2.3). Zum Abbrechen '0' eingeben.");
 		addValueButton = new JButton("Menge eingeben");
 		zwischensumme = new JLabel("Zwischensumme: "+ zValue +" €");
 		searchField = new JTextField("Suchwort: ");
@@ -239,7 +256,7 @@ public class GUIEinkauf extends JFrame
 		mengeHinweisArea.setBackground(interactionsPanel.getBackground());
 		mengeHinweisArea.setForeground(Color.red);		
 		
-		// Hier wird die Bestandsliste inkl. Scrollbalken und dazugehörigem Modell definiert 
+		// Hier wird die Bestandsliste inkl. Scrollbalken und dazugehörigem Modell definiert und mit Daten gefüllt
 		this.getContentPane().add(bestandsListePanel, BorderLayout.EAST);
 		bestandsListePanel.setBorder(BorderFactory.createTitledBorder("Bestandsliste"));
 		DefaultTableModel bestandsListeModel = new DefaultTableModel(dataBestand, columnNames);	// neue Objekte erzeugen
@@ -248,18 +265,9 @@ public class GUIEinkauf extends JFrame
 		bestandsListe.setFillsViewportHeight(true);
 		JScrollPane scrollPane = new JScrollPane(bestandsListe);
 		bestandsListePanel.add(scrollPane);
+		fillTable(bestandsListeModel);
 		
-		// Hier werden alle Artikel aus der xml-Datei ausgelesen
-		DatenLeser bla = new DatenLeser();
-	    XMLParser xml = new XMLParser(bla.getData());
-	    String article = xml.getChild("articles");
-		lager = new Lager(xml.getXML());
-		String[][] Array = lager.toStringArray();
-		for (int i = 0; i < Array.length; i++)
-		{
-			bestandsListeModel.addRow(Array[i]);
-		}
-
+		
 		// Zum späteren späteren Filtern
 		TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(bestandsListeModel);
 		bestandsListe.setRowSorter(tr);	
@@ -399,19 +407,22 @@ public class GUIEinkauf extends JFrame
 		 */
 		removeButton.addActionListener(new ActionListener() 
 		{
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) 
+			{
 				Object name = einkaufsListeModel.getValueAt(getRow(einkaufsListe), NameSpalte);
 				searchField.setText("");
 				int i = 0;
-				while (name != bestandsListeModel.getValueAt(i,NameSpalte)) 
+				while (!name.equals(bestandsListeModel.getValueAt(i,NameSpalte))) 
 				{
 					i++;
 		
 				}
-				if ((String)bestandsListeModel.getValueAt(i, StkPreis) != "n") {
+				if (!bestandsListeModel.getValueAt(i, StkZahl).equals("n")) 
+				{
 					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) bestandsListeModel.getValueAt(i,StkZahl)) + 1), i, StkZahl);
 					}	
-					else {
+					else 
+					{
 						bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) einkaufsListeModel.getValueAt(getRow(einkaufsListe),MengeSpalte)) + Float.parseFloat((String) bestandsListeModel.getValueAt(i,MengeSpalte))), i, MengeSpalte);
 					}
 				
@@ -427,16 +438,19 @@ public class GUIEinkauf extends JFrame
 		 */
 		removeAllButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) 
+			{
 				for (int i = 0; i < (Integer)einkaufsListe.getRowCount(); i++) 
 				{
 					String name = String.valueOf(einkaufsListeModel.getValueAt(i, NameSpalte));
 					int j = 0;
-					while (name != bestandsListeModel.getValueAt(j,NameSpalte)) 
+					while (!name.equals(bestandsListeModel.getValueAt(j,NameSpalte))) 
 					{
 						j++;
 					}
-					if (einkaufsListeModel.getValueAt(i, StkPreis) != "n") {
+					
+					if (!einkaufsListeModel.getValueAt(i, StkZahl).equals("n")) 
+					{
 					bestandsListeModel.setValueAt(String.valueOf(Float.parseFloat((String) bestandsListeModel.getValueAt(j,StkZahl)) + 1), j, StkZahl);
 					}	
 					else {
@@ -552,16 +566,15 @@ public class GUIEinkauf extends JFrame
 	/**
 	 * Dieser Button ermöglicht es dem Nutzer zur Adminansicht zu wechseln.w
 	 */
-	/*switchScreens.addActionListener(new ActionListener() {
+		switchScreensButton.addActionListener(new ActionListener() 
+		{
 
-        public void actionPerformed(ActionEvent arg0) {
+        public void actionPerformed(ActionEvent arg0) 
+        {
         	Main.switchToAdmin();
         }
- 
-   });*/
+		});
 	}
-	//(\w+)\.getSelectedRow\(\)
-	// getRow\($1\)
 	
 	public static void main(String[] args) 
 	{
