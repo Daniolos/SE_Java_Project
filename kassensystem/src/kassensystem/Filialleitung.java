@@ -126,7 +126,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 	        	 try {
 	        		 Main.switchToEinkauf();
 	        	 } catch (Exception ex) {
-	        		 System.out.println(ex);
 	        	 }
 	         }
 	  
@@ -721,7 +720,6 @@ public class Filialleitung extends JFrame implements ActionListener {
 		        		 articleAmountLabel.setText("Menge in "+ basePriceUnitValue);
 		        	 }
 	        	 } catch(Exception ex) {
-	        		 System.out.println(ex);
 	        	 }
 	         }
 	  
