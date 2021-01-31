@@ -153,6 +153,28 @@ public class Lager {
 		articles.add(new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis));
 		return 0;
 	}
+	
+	public int checkArtikel(String name, String ean, String preis, String anzahl, String grundpreis,
+			String preiseinheit, String gewicht, String einheit, String kategorie) {
+
+		// überprüfen, ob EAN schon in Liste ist
+		for (Artikel article : articles) {
+			if (new EanVerifizierer(ean).getformatierteEan().equals(article.getEan())) {
+				return -10; // gibt -10 zurück, wenn Artikel schon in Liste ist
+			}
+		}
+
+		Artikel article = new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis);
+		String[] arr = article.toStringArray();
+		for (int i = 0; i <= arr.length; i++) {
+			if (arr[i].equals("")) {
+				return (i + 1) * (-1); // gibt (index der Eigenschaft + 1) * -1 zurück, für Fehler bei Eigenschaft
+			}
+		}
+
+		// stock-parsing kann Fehler hervorrufen, hier in try-catch abfangen
+		return 0;
+	}
 
 	// TODO Brauchen wir das noch?
 	public Artikel search(String nameOrEan) {
