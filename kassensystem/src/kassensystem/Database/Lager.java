@@ -158,12 +158,6 @@ public class Lager {
 			String preiseinheit, String gewicht, String einheit, String kategorie) {
 
 		// überprüfen, ob EAN schon in Liste ist
-		for (Artikel article : articles) {
-			if (new EanVerifizierer(ean).getformatierteEan().equals(article.getEan())) {
-				return -10; // gibt -10 zurück, wenn Artikel schon in Liste ist
-			}
-		}
-
 		Artikel article = new Artikel(name, ean, kategorie, einheit, preiseinheit, gewicht, anzahl, preis, grundpreis);
 		String[] arr = article.toStringArray();
 		for (int i = 0; i <= arr.length; i++) {
