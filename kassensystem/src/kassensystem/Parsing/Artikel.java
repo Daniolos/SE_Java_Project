@@ -62,6 +62,9 @@ public class Artikel {
 	public boolean checkGewicht(String gewicht) {
 
 		if (!gewicht.matches("[0-9]*(,|.)?[0-9]+")) {
+			if (gewicht.equals("n")) {
+				return true;
+			}
 			return false;
 		}
 
