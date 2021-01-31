@@ -1,5 +1,11 @@
 import javax.swing.JFrame;
 
+/**
+ * 
+ * @author Daniel Jürgeleit, Julius Rappich, Felix Schulz
+ *
+ */
+
 public class Main {
 	public static Filialleitung admin;
 	public static GUIEinkauf gui;
