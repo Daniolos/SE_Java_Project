@@ -26,6 +26,12 @@ import javax.swing.JPanel;
 import javax.swing.RowFilter;
 import javax.swing.JTable;
 
+/**
+ * 
+ * @author Julius Rappich
+ *
+ */
+
 public class GUIEinkauf extends JFrame
 	{
 	//alle graphischen Elemente deklarieren:
@@ -397,10 +403,10 @@ public class GUIEinkauf extends JFrame
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				Object name = einkaufsListeModel.getValueAt(getRow(einkaufsListe), NameSpalte);
+				Object name = einkaufsListeModel.getValueAt(getRow(einkaufsListe), EANSpalte);
 				searchField.setText("");
 				int i = 0;
-				while (!name.equals(bestandsListeModel.getValueAt(i,NameSpalte))) 
+				while (!name.equals(bestandsListeModel.getValueAt(i,EANSpalte))) 
 				{
 					i++;
 		
@@ -430,9 +436,9 @@ public class GUIEinkauf extends JFrame
 			{
 				for (int i = 0; i < (Integer)einkaufsListe.getRowCount(); i++) 
 				{
-					String name = String.valueOf(einkaufsListeModel.getValueAt(i, NameSpalte));
+					String name = String.valueOf(einkaufsListeModel.getValueAt(i, EANSpalte));
 					int j = 0;
-					while (!name.equals(bestandsListeModel.getValueAt(j,NameSpalte))) 
+					while (!name.equals(bestandsListeModel.getValueAt(j,EANSpalte))) 
 					{
 						j++;
 					}
@@ -562,18 +568,4 @@ public class GUIEinkauf extends JFrame
         }
 		});
 	}
-	
-//	public static void main(String[] args) 
-//	{
-//		java.awt.EventQueue.invokeLater(new Runnable() {
-//			public void run() 
-//			{
-//			GUIEinkauf gui = new GUIEinkauf();
-//			gui.setTitle("Einkaufsansicht");
-//			gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//			gui.setExtendedState(JFrame.MAXIMIZED_BOTH);  //Fullscreen
-//			gui.setVisible(true);
-//			}
-//		});
-//	}
 }
